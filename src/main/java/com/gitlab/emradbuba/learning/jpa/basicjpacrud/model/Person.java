@@ -35,4 +35,6 @@ public class Person {
     @NotNull
     private LocalDate dateOfBirth;
 
+    @OneToOne(mappedBy = "person")
+    private IdCard idCard;
 }

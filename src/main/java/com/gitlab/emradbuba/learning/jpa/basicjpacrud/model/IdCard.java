@@ -31,4 +31,8 @@ public class IdCard {
     @Column(name = "PUBLISHER")
     @NotNull
     private String publishedBy;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "PERSON_ID", referencedColumnName = "id")
+    private Person person; // Foreign key
  }
