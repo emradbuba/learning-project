@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -33,6 +35,7 @@ public class IdCard {
     private String publishedBy;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PERSON_ID", referencedColumnName = "id")
-    private Person person; // Foreign key
+    @JoinColumn(name = "PERSON_ID")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Person person; // <-- Foreign key: PK in Person
  }

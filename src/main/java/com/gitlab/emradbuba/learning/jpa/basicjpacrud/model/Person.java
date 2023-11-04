@@ -35,6 +35,13 @@ public class Person {
     @NotNull
     private LocalDate dateOfBirth;
 
-    @OneToOne(mappedBy = "person")
+    /* OneToOne options:
+        - ForeignKey approach (used here)
+        - Shared Primary Key
+        - JoinTable
+    */
+    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private IdCard idCard;
+
+
 }
