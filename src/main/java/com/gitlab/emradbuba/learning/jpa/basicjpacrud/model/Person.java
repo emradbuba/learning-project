@@ -44,6 +44,11 @@ public class Person {
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private IdCard idCard;
 
+    @OneToMany(mappedBy = "person",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Set<EmploymentCertificate> certificates;
+
     @OneToMany(mappedBy = "person")
     private Set<PersonAddressAssignment> personAddressAssignments;
 }
