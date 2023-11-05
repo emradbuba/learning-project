@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "PERSON")
@@ -43,5 +44,6 @@ public class Person {
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private IdCard idCard;
 
-
+    @OneToMany(mappedBy = "person")
+    private Set<PersonAddressAssignment> personAddressAssignments;
 }

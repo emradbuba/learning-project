@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "ADDRESS")
 @NoArgsConstructor
@@ -27,4 +29,7 @@ public class Address {
     private String city;
     @NotNull
     private String country;
+
+    @OneToMany(mappedBy = "address")
+    private Set<PersonAddressAssignment> personAddressAssignments;
 }
