@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,12 +42,11 @@ public class Person {
         - Shared Primary Key
         - JoinTable
     */
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @JsonManagedReference
     private IdCard idCard;
 
-    @OneToMany(mappedBy = "person",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToMany(mappedBy = "person")
     private Set<EmploymentCertificate> certificates;
 
     @OneToMany(mappedBy = "person")

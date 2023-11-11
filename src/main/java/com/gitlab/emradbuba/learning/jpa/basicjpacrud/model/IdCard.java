@@ -1,13 +1,12 @@
 package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -34,8 +33,8 @@ public class IdCard {
     @NotNull
     private String publishedBy;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "PERSON_ID")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Person person; // <-- Foreign key: PK in Person
- }
+    @JsonBackReference
+    private Person person;
+}

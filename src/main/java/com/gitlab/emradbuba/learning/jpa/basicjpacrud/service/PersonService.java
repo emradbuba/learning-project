@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.jpa.basicjpacrud.service;
 
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PutExistingPersonRequest;
-import com.gitlab.emradbuba.learning.jpa.basicjpacrud.exceptions.PersonNotFoundException;
+import com.gitlab.emradbuba.learning.jpa.basicjpacrud.exceptions.PersonNotFoundAppException;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.Person;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.persistance.PersonRepository;
 import lombok.AllArgsConstructor;
@@ -21,15 +21,16 @@ public class PersonService {
         return personRepository.save(newPerson);
     }
 
-    public void deletePerson(Long id) {
-        if (personRepository.existsById(id)) {
-            personRepository.deleteById(id);
+    public void deletePerson(Long personId) {
+        if (personRepository.existsById(personId)) {
+            personRepository.deleteById(personId);
         }
+        throw new PersonNotFoundAppException("No person found for given personId: " + personId);
     }
 
     public Person updateExistingPerson(PutExistingPersonRequest putExistingPersonRequest, Long personId) {
         Person existingPerson = personRepository.findById(personId)
-                .orElseThrow(() -> new PersonNotFoundException("No person found for given personId: " + personId));
+                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personId));
         existingPerson.setFirstName(putExistingPersonRequest.getFirstName());
         existingPerson.setSurname(putExistingPersonRequest.getSurname());
         existingPerson.setDateOfBirth(putExistingPersonRequest.getDateOfBirth());
@@ -39,6 +40,6 @@ public class PersonService {
     public Person getPerson(Long personId) {
         return personRepository
                 .findById(personId)
-                .orElseThrow(() -> new PersonNotFoundException("No person found for given personId: " + personId));
+                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personId));
     }
 }
