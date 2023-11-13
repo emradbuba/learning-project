@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -36,9 +37,7 @@ public class EmploymentCertificate {
     @NotNull
     private LocalDate endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "PERSON_ID", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
+    @JsonBackReference
+    @ManyToOne
     private Person person;
 }
