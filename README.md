@@ -81,7 +81,13 @@ There also a nice feature of making task list:
 And this is an example of collapsed content... 
 </details>
 
-{::options parse_block_html="true" /}
-My important paragraph.
-{: .alert .alert-info}
-{::options parse_block_html="false" /}
+<div class="panel panel-info">
+**Note**
+{: .panel-heading}
+<div class="panel-body">
+
+NOTE DESCRIPTION
+
+</div>
+</div>
+
