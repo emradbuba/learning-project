@@ -54,7 +54,7 @@ There also a nice feature of making task list:
 - [x] Item 2
 - [ ] Item 3
 
-### Extra sections: 
+### Extra sections (GitHub): 
 
 > INFO\
 > Highlights information that users should take into account, even when skimming.
@@ -73,3 +73,13 @@ There also a nice feature of making task list:
 
 > [!Warning]\
 > This is Warning!
+> 
+
+### Collapsable text: 
+<details>
+<summary>Exmaple of collapsable block</summary>
+And this is an example of collapsed content... 
+</details>
+
+My warning paragraph.
+{: .alert .alert-warning}
