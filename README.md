@@ -1,4 +1,3 @@
-{::options parse_block_html="true" /}
 # Header 1
 ## Header 2
 ### Header 3
@@ -82,5 +81,7 @@ There also a nice feature of making task list:
 And this is an example of collapsed content... 
 </details>
 
-My warning paragraph.
-{: .alert .alert-warning}
+{::options parse_block_html="true" /}
+My important paragraph.
+{: .alert .alert-info}
+{::options parse_block_html="false" /}
