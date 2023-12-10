@@ -1,3 +1,4 @@
+{::options parse_block_html="true" /}
 # Header 1
 ## Header 2
 ### Header 3
