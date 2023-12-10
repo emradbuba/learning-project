@@ -81,13 +81,3 @@ There also a nice feature of making task list:
 And this is an example of collapsed content... 
 </details>
 
-<div class="panel panel-info">
-**Note**
-{: .panel-heading}
-<div class="panel-body">
-
-NOTE DESCRIPTION
-
-</div>
-</div>
-
