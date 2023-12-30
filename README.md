@@ -144,6 +144,154 @@ try {
 > See: <a href="https://4programmers.net/Forum/Java/196193-jpa">4programmers - JPA - metoda flush()</a> (PL)
 </details>
 
+## Relationships
+<details>
+<summary>Owner of the relationship</summary>
+
+> The side of relation which defines the `JoinColumn`
+</details>
+
+<details>
+<summary>Which side of a relationship contins the <code>mappedBy</code> attribute?</summary>
+
+The child - so the oposite to owner of relationship. `mappedBy` corresponds to field in the owner entity.
+</details>
+
+
+### @OneToOne
+Let's assume we have a `Person` which has an `IdCard`
+
+#### Option 1 - unidirectional relationship
+```java
+public class Person {
+    
+  @OneToOne
+  @JoinColumn(name = "ID_CARD_ID") // <-- customize the join column name in database
+  private IdCard idCard;
+
+}
+```
+
+Adding the entry (similar with update):
+```java
+@Service
+public class IdCardService {
+    
+    public Person addIdCardToPerson(Long personId, PostIdCardRequest postIdCardDtoRequest) {
+        //...
+        IdCard idCard = new IdCard();
+        idCard.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
+        idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
+        idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
+
+        existingPerson.setIdCard(idCard);
+        idCardRepository.save(idCard); // no cascading, so we need to persist this entity too...
+        return personRepository.save(existingPerson);
+    }
+}
+```
+
+Delete logic: 
+```java
+public Person deleteIdCardFromPerson(Long personId) {
+    Person existingPerson = getPersonByIdOrThrow(personId);
+    if (existingPerson.getIdCard() != null) {
+        existingPerson.setIdCard(null); // <-- !
+        return personRepository.save(existingPerson);
+    }
+    throw new PersonNotFoundAppException("No person found for given personId: " + personId);
+}
+```
+
+<details>
+<summary>Will above example remove the <code>idCard</code> from database?</summary>
+
+No - there default `orphanRemoval` is set to `false`, so when existing `idCard` in "unrelated" from person (setting `null`) it is still in database
+`orphanRemoval` - `false` allows to *preserve* an entry in the database ***even if parent is removed***
+It will be changed if we modify relation:
+
+```java
+@OneToOne(orphanRemoval = true)
+@JoinColumn(name = "ID_CARD_ID")
+private IdCard idCard;
+```
+
+Now, when idCard is set to `null` in person, the orphaned `idCard` is also removed from database as it's not referenced any more
+
+</details>
+
+<details>
+<summary>Do we need to save/persist all entities each time?</summary>
+
+No, we can use cascading in this case... Let's assume:
+```java
+@OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
+@JoinColumn(name = "ID_CARD_ID")
+private IdCard idCard;
+```
+It says: *"if you persist the `Person` persist also `IdCard`"* so we can remove the extra `idCardRepository.save(idCard)`':
+```java
+ public Person addIdCardToPerson(Long personId, PostIdCardRequest postIdCardDtoRequest) {
+        // ...
+        IdCard idCard = new IdCard();
+        idCard.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
+        idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
+        idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
+        
+        existingPerson.setIdCard(idCard);
+        return personRepository.save(existingPerson); // <-- idCard will also be persisted
+    }
+```
+without cascading we would see
+> *org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing*
+
+as we want to persist a `Person` which has `idCard` not present in database
+
+</details>
+
+<details>
+<summary>Difference between `orphanRemoval` and `Cascade.REMOVE`</summary>
+
+From stackoverflow: https://stackoverflow.com/questions/4329577/how-does-jpa-orphanremoval-true-differ-from-the-on-delete-cascade-dml-clause
+
+> `orphanRemoval` has nothing to do with `ON DELETE CASCADE` <br>
+> `orphanRemoval` is an entirely **ORM-specific thing**. It marks "child" entity to be removed when it's no longer referenced from the "parent" entity, e.g. when you remove the child entity from the corresponding collection of the parent entity.<br>
+> `ON DELETE CASCADE` is a **database-specific** thing, it deletes the "child" row in the database when the "parent" row is deleted.<br>
+
+</details>
+
+
+#### Option 2 - bidirectional
+Work in both directions
+
+Add @OneToOne on the other side (in this case in IdCard)
+```java
+    @OneToOne(mappedBy = "idCard")
+    @JsonBackReference
+    private Person person;
+```
+When adding to context --> add both dependencies in both directions (probably will work but not guaranteed)
+```java
+    // ...
+    IdCard idCard = existingPerson.getIdCard();
+    idCard.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
+    idCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
+    idCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
+    
+    idCard.setPerson(existingPerson); // \_
+    existingPerson.setIdCard(idCard); // /
+    
+    return personRepository.save(existingPerson); // PERSIST cascade will also persist the IdCard
+```
+
+
+<details>
+<summary>Other ways to implement <code>@OneToOne</code> relations</summary>
+
+> * Using Shared Primary Key using `@PrimaryKeyJoinColumn`
+> * Using extra joining table using `@JoinTable` - helps to avoid `null` values in relation-related fields.
+</details>
+
 ### Related topics
 <details>
 <summary>
@@ -207,4 +355,19 @@ Hikari - what it is? Is it used in Spring? Can be configured/customized?
 <summary><code>Custom strategies</code></summary>
 
 > Out of scope here, but we can create custom generators for OK ids.
+</details>
+
+<details>
+<summary>Cascade.ALL not recomended?</summary>
+
+> We create too much, potentially unexpected, behavior - cascade only what you need to cascade
+</details>
+
+<details>
+<summary>Default fetchType for <code>@OneToOne</code></summary>
+
+> @OneToOne(fetchType = "...")
+
+For "single field" dependencies like `Person` and `IdCard`, in asked for a `Person`, `IdCard` data will be also selected (`FetchType.EAGER`)
+If set to `FetchType.LAZY` - only when `IdCard` is first used
 </details>
