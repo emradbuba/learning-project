@@ -145,10 +145,12 @@ try {
 </details>
 
 ## Relationships
+**************
+
 <details>
 <summary>Owner of the relationship</summary>
 
-> The side of relation which defines the `JoinColumn`
+> The side of relation which defines the `JoinColumn` - the side which has the foreign key
 </details>
 
 <details>
@@ -159,9 +161,8 @@ The child - so the oposite to owner of relationship. `mappedBy` corresponds to f
 
 
 ### @OneToOne
-Let's assume we have a `Person` which has an `IdCard`
 
-#### Option 1 - unidirectional relationship
+#### @OneToOne - unidirectional relationship
 ```java
 public class Person {
     
@@ -261,7 +262,7 @@ From stackoverflow: https://stackoverflow.com/questions/4329577/how-does-jpa-orp
 </details>
 
 
-#### Option 2 - bidirectional
+#### @OneToOne - bidirectional relationship
 Work in both directions
 
 Add @OneToOne on the other side (in this case in IdCard)
@@ -278,7 +279,7 @@ When adding to context --> add both dependencies in both directions (probably wi
     idCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
     idCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
     
-    idCard.setPerson(existingPerson); // \_
+    idCard.setPerson(existingPerson); // \ 
     existingPerson.setIdCard(idCard); // /
     
     return personRepository.save(existingPerson); // PERSIST cascade will also persist the IdCard
@@ -290,6 +291,97 @@ When adding to context --> add both dependencies in both directions (probably wi
 
 > * Using Shared Primary Key using `@PrimaryKeyJoinColumn`
 > * Using extra joining table using `@JoinTable` - helps to avoid `null` values in relation-related fields.
+</details>
+
+### @OneToMany
+For example:
+* one `EmploymentCertificate` belongs to a single `Person`, but...
+* ... one `Person` may have many `EmploymentCertificates`
+
+<details>
+<summary>What three(3) options of implemention do we have?</summary>
+
+* Two unidirectional - depending which side owns the relationship
+* Bidirectional
+</details>
+
+#### First unidirectional approach - no collection:
+
+<details>
+<summary>How to do it and how hibernate creates it?</summary>
+
+```java
+import jakarta.persistence.JoinColumn;
+
+public class EmploymentCertificate {
+
+    // ...
+
+    @ManyToOne
+    @JoinColumn("person_id") // <-- not necessary, it would be default behaviour
+    private Person person;
+}
+```
+</details>
+
+#### Second unidirectional approach - with collection:
+
+<details>
+<summary>How to do it and how hibernate creates it?</summary>
+
+The owner can be only one (where the `@ManyToOne` is defined), but we can also use the `@OneToMany` which is always on oposite side of relation
+
+```java
+public class Person {
+
+    @OneToMany
+    private Set<EmploymentCertificate> certificates;
+}
+```
+
+> ***NOTE***
+> Do not do it :) In this case Hibernate will create an extra join table as it does not know where to put foreign key. So in practice we will have many to many. 
+
+<details>
+<summary>How to avoid extra table?</summary>
+
+> We can use @JoinTable (only case where JoinTable is place in non-owner side of relation) to indicate a column with foreign key:
+> 
+> ```java
+> import jakarta.persistence.JoinColumn;
+> 
+> public class Person {
+> 
+>     @OneToMany
+>     @JoinTable(name = "person_id")
+>     private Set<EmploymentCertificate> certificates;
+> }
+> ```
+</details>
+</details>
+
+#### Bidirectional relationship
+```java
+@OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+private Set<EmploymentCertificate> certificates;
+```
+```java
+@ManyToOne
+@JoinColumn(name = "post")
+private Person person;
+```
+
+* Important:
+  * *mappedBy* - Always in bidirectional relations use it (on non-owner side)
+  * *setting bidirectional relation in context* - Always (if not cascaded) add both relation "directions". It could work without it, but it not guaranted by ORM.
+  * *cascading* - we say 'if you persist person, persist also certificates'
+    * Depending on the side of relation we may want to define different cascading rules
+
+<details>
+<summary>Fetching in <code>@OneToMany</code></summary>
+
+* For single field - default is `EAGER`; LAZY not recommended as it creates extra query instead of join sql from beginnig
+* For collections - default is `LAZY`; it makes sense as we usually do not need to load all data from collection
 </details>
 
 ### Related topics
