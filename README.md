@@ -2,7 +2,14 @@
 This nice [YouTube](https://www.youtube.com/playlist?list=PLEocw3gLFc8UYNv0uRG399GSggi8icTL6) playlist goes through most of material in this small project.
 
 ### TODO
-> Pid generation -> select FOR UPDATE - set lock on the table (perimistic lock)"
+> * Entity lifecycle: Create more details descriptions and use cases
+> * Pid generation -> select FOR UPDATE - set lock on the table (perimistic lock)"
+> * How to create JPA Entities from existing database
+> * Involving some kind of liquibase scripts
+
+### Resources
+* https://www.objectdb.com/java/jpa/getting/started
+* 
 
 ### Basic notes
 
@@ -29,6 +36,13 @@ This nice [YouTube](https://www.youtube.com/playlist?list=PLEocw3gLFc8UYNv0uRG39
 </details>
 
 <details>
+<summary>Is an Entity corresonding to database row, always the same object in memory?</summary>
+
+> If we ask same EntityManager for an entity then yes, but we can have many `EntityManager` each of which has its own persistance context 
+> so we may have same database object represented by multiple in memory objects - each in different persistence context. 
+</details>
+
+<details>
 <summary>Will the below name be stored in database?</summary>
 
 > Yes. Not in the same line where the comment, but when transaction is finished Hiberate/JPA will mirror the state
@@ -47,7 +61,39 @@ try {
 }
 ```
 
-#### Entity lifecycle
+## Entity lifecycle
+
+### Lifecycle
+There are four states in lifecycle of entity (see: [ObjectDB article](https://www.objectdb.com/java/jpa/persistence/managed))
+<details>
+<summary>New/Transient state</summary>
+
+> Not yet in an `EntityManager`, not in database - just a created instance of an entity
+</details>
+
+<details>
+<summary>Managed state</summary>
+
+> * Entity becomes managed when it is *persisted*, so added to the context of EntityManager
+> * It is also managed when retrieved from `EntityManager`
+</details>
+
+<details>
+<summary>Removed state</summary>
+
+> It's when **managed** entity is marked to delete by `em.remove(entity)` so it will be removed from DB when committing transaction. 
+</details>
+
+<details>
+<summary>Detached state</summary>
+
+> Represents entity objects that have been disconnected from the EntityManager. <br>
+> For instance, all the managed objects of an EntityManager become detached when the EntityManager is closed or `em.clear`ed.<br> 
+> Working with detached objects, including merging them back to an EntityManager.
+</details>
+
+### Entity lifecycle actions
+
 There are some basic lifecycle action of an entity: 
 <details>
 <summary><code>em.persist</code></summary>
@@ -57,7 +103,9 @@ There are some basic lifecycle action of an entity:
 <details>
 <summary><code>em.find</code></summary>
 
-> Find the entity in database and adds it to the context if not already exist
+> Find the entity in database and adds it to the context if not already exist. <br>
+> If already exists in context, the object from context will be returned.
+> Every entity object can be uniquely identified and retrieved by the combination of its class and its primary key.
 </details>
 <details>
 <summary><code>em.remove</code></summary>
@@ -81,9 +129,16 @@ There are some basic lifecycle action of an entity:
 </details>
 
 <details>
+<summary><code>em.clear</code></summary>
+
+All managed entites are being detached. 
+</details>
+
+<details>
 <summary><code>em.find</code> vs. <code>em.getReference</code></summary>
 
-> `em.getReference` is more "lazy" and creates only a reference to a database object. It sends query to database when it is really required.
+> `em.getReference` is more "lazy" and, when object is not in context, it creates only a reference to a database object with valid id (a "hollow" object). <br> 
+> It sends query to database when it is really required (when object is accessed).
 > On the contrary, the `em.find` immediately sends a `SELECT` to DBMS and adds it to context.
 ```java
 try {
@@ -100,6 +155,8 @@ try {
 ```
 </details>
 
+***See:*** [Nice resource](https://www.objectdb.com/java/jpa/persistence/retrieve) explaining Storing/Retrieving entities
+<br>
 <br>
 <details>
 <summary>Does the below code will create an entry in database?</summary>
@@ -157,6 +214,13 @@ try {
 <summary>Which side of a relationship contins the <code>mappedBy</code> attribute?</summary>
 
 The child - so the oposite to owner of relationship. `mappedBy` corresponds to field in the owner entity.
+</details>
+
+<details>
+<summary>What is one of advantage of using bidirectional relationships instead of uni-?</summary>
+
+> When allows to create JPQL (Java Persistence query language) queries from both sides of relations which can be helpful depending on circumstances
+> 
 </details>
 
 
@@ -259,6 +323,12 @@ From stackoverflow: https://stackoverflow.com/questions/4329577/how-does-jpa-orp
 > `orphanRemoval` is an entirely **ORM-specific thing**. It marks "child" entity to be removed when it's no longer referenced from the "parent" entity, e.g. when you remove the child entity from the corresponding collection of the parent entity.<br>
 > `ON DELETE CASCADE` is a **database-specific** thing, it deletes the "child" row in the database when the "parent" row is deleted.<br>
 
+> In other words, it about disconnecting the relation between objects in JPA. So: 
+> ```java
+> person.setIdCard(null);
+> person.save();
+> ```
+> will remove previously assigned `IdCard` only if `orphanRemoval` is `true`. Otherwise, event if `cascade=REMOVE` is set, it will not take place as setting a `null` idcard is not a removal of a `Person`.
 </details>
 
 
@@ -372,7 +442,7 @@ private Person person;
 ```
 
 * Important:
-  * *mappedBy* - Always in bidirectional relations use it (on non-owner side)
+  * *mappedBy* - in bidirectional relations always use it (on non-owner side)
   * *setting bidirectional relation in context* - Always (if not cascaded) add both relation "directions". It could work without it, but it not guaranted by ORM.
   * *cascading* - we say 'if you persist person, persist also certificates'
     * Depending on the side of relation we may want to define different cascading rules
@@ -383,6 +453,52 @@ private Person person;
 * For single field - default is `EAGER`; LAZY not recommended as it creates extra query instead of join sql from beginnig
 * For collections - default is `LAZY`; it makes sense as we usually do not need to load all data from collection
 </details>
+
+### @ManyToMany
+Basic to approches are uni- and bidirectional relationships
+
+#### @ManyToMany uni-directional
+
+Basic implemetation of uni directional relation of ManyToMany is as follows: 
+
+```java
+public class Person {
+    // ...
+  
+    @ManyToMany
+    @JoinTable(
+        name = "person_address",
+        joinColumns = @JoinColumn(name = "person_id"),
+        inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private Set<AddressUniDirectional> addresses;
+}
+```
+
+#### @ManyToMany bi-directional
+Here we can just add the same `@ManyToMany` mapping on the other side of relation (in `Address`) remembering about `mappedBy` being specified in the 'oposite' side of relation (`JoinTable` always on *ownership* side)
+
+```java
+public class Person {
+  // ...
+  @ManyToMany
+  @JoinTable(
+          name = "person_address",
+          joinColumns = @JoinColumn(name = "person_id"),
+          inverseJoinColumns = @JoinColumn(name = "address_id")
+  )
+  private Set<Address> addresses;
+}
+
+
+public class Address {
+    // ...
+    @ManyToMany(mappedBy = "addresses")
+    private Set<Person> persons;
+}
+```
+
+When adding, of course, we need to link all relations to JPA entities. 
 
 ### Related topics
 <details>
