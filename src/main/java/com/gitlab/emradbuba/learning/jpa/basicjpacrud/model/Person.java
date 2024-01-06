@@ -40,6 +40,6 @@ public class Person {
     @JsonManagedReference
     private IdCard idCard;
 
-    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST})
     private Set<EmploymentCertificate> certificates;
 }
