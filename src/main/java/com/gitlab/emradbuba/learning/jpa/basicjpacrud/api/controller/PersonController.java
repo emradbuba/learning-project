@@ -28,10 +28,11 @@ public class PersonController {
     @PutMapping("/{personId}")
     public ResponseEntity<Person> updateExistingPerson(@RequestBody PutExistingPersonRequest putExistingPersonRequest,
                                                        @PathVariable("personId") Long personId) {
-        return new ResponseEntity<>(personService.updateExistingPerson(putExistingPersonRequest, personId), HttpStatus.OK);
+        return new ResponseEntity<>(personService.updateExistingPerson(personId, putExistingPersonRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{personId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePerson(@PathVariable("personId") Long id) {
         personService.deletePerson(id);
     }

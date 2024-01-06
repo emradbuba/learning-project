@@ -1,15 +1,12 @@
 package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -22,7 +19,7 @@ import java.time.LocalDate;
 public class EmploymentCertificate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "COMPANY_NAME")
@@ -39,5 +36,6 @@ public class EmploymentCertificate {
 
     @JsonBackReference
     @ManyToOne
+    @JoinColumn(name = "person")
     private Person person;
 }

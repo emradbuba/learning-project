@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,6 +16,7 @@ import java.util.Set;
 @Setter
 @Getter
 public class Person {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -35,18 +35,11 @@ public class Person {
     @NotNull
     private LocalDate dateOfBirth;
 
-    /* OneToOne options:
-        - ForeignKey approach (used here)
-        - Shared Primary Key
-        - JoinTable
-    */
-    @OneToOne(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @JoinColumn(name = "ID_CARD_ID")
     @JsonManagedReference
     private IdCard idCard;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<EmploymentCertificate> certificates;
-
-    @OneToMany(mappedBy = "person")
-    private Set<PersonAddressAssignment> personAddressAssignments;
 }

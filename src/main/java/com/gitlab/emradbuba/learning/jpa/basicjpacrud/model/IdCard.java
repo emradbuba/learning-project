@@ -33,8 +33,7 @@ public class IdCard {
     @NotNull
     private String publishedBy;
 
-    @OneToOne
-    @JoinColumn(name = "PERSON_ID")
+    @OneToOne(mappedBy = "idCard")
     @JsonBackReference
     private Person person;
 }

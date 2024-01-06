@@ -1,14 +1,10 @@
 package com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.controller;
 
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PostCertificateRequest;
-import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PostIdCardRequest;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PutCertificateRequest;
-import com.gitlab.emradbuba.learning.jpa.basicjpacrud.api.model.request.PutIdCardRequest;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.EmploymentCertificate;
-import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.IdCard;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.Person;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.service.EmploymentCertificateService;
-import com.gitlab.emradbuba.learning.jpa.basicjpacrud.service.IdCardService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,13 +43,11 @@ public class EmploymentCertificateController {
     @DeleteMapping("/person/{personId}/{certificateId}")
     public ResponseEntity<Person> deletePersonIdCard(@PathVariable("personId") Long personId,
                                                      @PathVariable("certificateId") Long certificateId) {
-        employmentCertificateService.deleteCertificateFromPerson(personId, certificateId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(employmentCertificateService.deleteCertificateFromPerson(personId, certificateId));
     }
 
     @DeleteMapping("/all/person/{personId}")
     public ResponseEntity<Person> deleteAllCertificatesFromPerson(@PathVariable("personId") Long personId) {
-        employmentCertificateService.deleteAllCertificatesFromPerson(personId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(employmentCertificateService.deleteAllCertificatesFromPerson(personId));
     }
 }

@@ -30,6 +30,6 @@ public class Address {
     @NotNull
     private String country;
 
-    @OneToMany(mappedBy = "address")
-    private Set<PersonAddressAssignment> personAddressAssignments;
+//    @ManyToMany(mappedBy = "addresses")
+//    private Set<Person> persons;
 }

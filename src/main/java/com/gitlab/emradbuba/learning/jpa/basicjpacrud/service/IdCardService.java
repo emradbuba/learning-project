@@ -7,6 +7,7 @@ import com.gitlab.emradbuba.learning.jpa.basicjpacrud.exceptions.IdCardDoesNotEx
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.exceptions.PersonNotFoundAppException;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.IdCard;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.model.Person;
+import com.gitlab.emradbuba.learning.jpa.basicjpacrud.persistance.IdCardRepository;
 import com.gitlab.emradbuba.learning.jpa.basicjpacrud.persistance.PersonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class IdCardService {
     private final PersonRepository personRepository;
+    private final IdCardRepository idCardRepository;
 
     public Optional<IdCard> getIdCardFromPerson(Long personId) {
         Person existingPerson = getPersonByIdOrThrow(personId);
-        return Optional.of(existingPerson.getIdCard());
+        return Optional.ofNullable(existingPerson.getIdCard());
     }
 
     @Transactional
@@ -36,10 +38,9 @@ public class IdCardService {
         idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
         idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
         idCard.setPerson(existingPerson);
-        existingPerson.setIdCard(idCard);
 
-        // idCardRepository.save(idCard); // <-- cascade.REMOVE ensures this...
-        return personRepository.save(existingPerson);
+        existingPerson.setIdCard(idCard);
+        return personRepository.save(existingPerson); // <-- Cascade.PERSIST will also persist a newly created IdCard entity
     }
 
     @Transactional
@@ -49,22 +50,21 @@ public class IdCardService {
         if (existingIdCard == null) {
             throw new IdCardDoesNotExistAppException("IdCard does not exist for person with id: " + personId);
         }
-        IdCard idCard = existingPerson.getIdCard();
-        idCard.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
-        idCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
-        idCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
-        idCard.setPerson(existingPerson);
-        existingPerson.setIdCard(idCard);
+        existingIdCard.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
+        existingIdCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
+        existingIdCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
+        existingIdCard.setPerson(existingPerson);
 
-        // idCardRepository.save(idCard); // <-- cascade.REMOVE ensures this...
         return personRepository.save(existingPerson);
     }
 
     @Transactional
     public Person deleteIdCardFromPerson(Long personId) {
         Person existingPerson = getPersonByIdOrThrow(personId);
-        if (existingPerson.getIdCard() != null) {
-            existingPerson.setIdCard(null); // orphanRemoval removes "orphaned" cardId
+        IdCard idCardToDelete = existingPerson.getIdCard();
+        if (idCardToDelete != null) {
+            existingPerson.setIdCard(null); // orphanRemoval "true" would remove idCard as it has no more references...
+            idCardRepository.delete(idCardToDelete); // (without orphanRemoval this is necessary)
             return personRepository.save(existingPerson);
         }
         throw new PersonNotFoundAppException("No person found for given personId: " + personId);

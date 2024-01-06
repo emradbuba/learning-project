@@ -42,7 +42,6 @@ public class IdCardController {
 
     @DeleteMapping("/person/{personId}")
     public ResponseEntity<Person> deletePersonIdCard(@PathVariable("personId") Long personId) {
-        idCardService.deleteIdCardFromPerson(personId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(idCardService.deleteIdCardFromPerson(personId));
     }
 }
