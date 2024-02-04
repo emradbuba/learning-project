@@ -1,5 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
+import com.gitlab.emradbuba.learning.learningproject.api.converters.certificate.PostCertificateRequestConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.converters.certificate.PutCertificateRequestConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
@@ -17,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class EmploymentCertificateController {
     private final EmploymentCertificateService employmentCertificateService;
+    private final PostCertificateRequestConverter postCertificateRequestConverter;
+    private final PutCertificateRequestConverter putCertificateRequestConverter;
 
     @GetMapping("/person/{personId}")
     public ResponseEntity<List<EmploymentCertificate>> getPersonEmploymentCertificates(@PathVariable("personId") Long personId) {
@@ -26,8 +30,9 @@ public class EmploymentCertificateController {
     @PostMapping("/person/{personId}")
     public ResponseEntity<Person> addPersonCertificate(@PathVariable("personId") Long personId,
                                                        @RequestBody PostCertificateRequest postCertificateRequest) {
+        EmploymentCertificate employmentCertificate = postCertificateRequestConverter.toBusinessModel(postCertificateRequest);
         return new ResponseEntity<>(
-                employmentCertificateService.addCertificateToPerson(personId, postCertificateRequest),
+                employmentCertificateService.addCertificateToPerson(personId, employmentCertificate),
                 HttpStatus.CREATED
         );
     }
@@ -36,8 +41,9 @@ public class EmploymentCertificateController {
     public ResponseEntity<Person> updatePersonIdCard(@PathVariable("personId") Long personId,
                                                      @PathVariable("certificateId") Long certificateId,
                                                      @RequestBody PutCertificateRequest putCertificateRequest) {
+        EmploymentCertificate employmentCertificate = putCertificateRequestConverter.toBusinessModel(putCertificateRequest);
         return ResponseEntity.ok(employmentCertificateService.updateCertificateInPerson(personId, certificateId,
-                putCertificateRequest));
+                employmentCertificate));
     }
 
     @DeleteMapping("/person/{personId}/{certificateId}")

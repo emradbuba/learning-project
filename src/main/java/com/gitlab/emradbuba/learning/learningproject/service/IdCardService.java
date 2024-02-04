@@ -1,7 +1,5 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostIdCardRequest;
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardAlreadyExistsAppException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardDoesNotExistAppException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
@@ -27,32 +25,33 @@ public class IdCardService {
     }
 
     @Transactional
-    public Person addIdCardToPerson(Long personId, PostIdCardRequest postIdCardDtoRequest) {
+    public Person addIdCardToPerson(Long personId, IdCard idCard) {
         Person existingPerson = getPersonByIdOrThrow(personId);
         IdCard existingIdCard = existingPerson.getIdCard();
         if (existingIdCard != null) {
             throw new IdCardAlreadyExistsAppException("IdCard already exists for person with id: " + personId);
         }
-        IdCard idCard = new IdCard();
-        idCard.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
-        idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
-        idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
-        idCard.setPerson(existingPerson);
+        IdCard newIdCard = new IdCard();
+        newIdCard.setSerialNumber(idCard.getSerialNumber());
+        newIdCard.setValidUntil(idCard.getValidUntil());
+        newIdCard.setPublishedBy(idCard.getPublishedBy());
+        newIdCard.setPerson(existingPerson);
 
-        existingPerson.setIdCard(idCard);
-        return personRepository.save(existingPerson); // <-- Cascade.PERSIST will also persist a newly created IdCard entity
+        existingPerson.setIdCard(newIdCard);
+        return personRepository.save(existingPerson); // <-- Cascade.PERSIST will also persist a newly created IdCard
+        // entity
     }
 
     @Transactional
-    public Person updateIdCardInPerson(Long personId, PutIdCardRequest putIdCardDtoRequest) {
+    public Person updateIdCardInPerson(Long personId, IdCard idCardFromRequest) {
         Person existingPerson = getPersonByIdOrThrow(personId);
         IdCard existingIdCard = existingPerson.getIdCard();
         if (existingIdCard == null) {
             throw new IdCardDoesNotExistAppException("IdCard does not exist for person with id: " + personId);
         }
-        existingIdCard.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
-        existingIdCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
-        existingIdCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
+        existingIdCard.setSerialNumber(idCardFromRequest.getSerialNumber());
+        existingIdCard.setValidUntil(idCardFromRequest.getValidUntil());
+        existingIdCard.setPublishedBy(idCardFromRequest.getPublishedBy());
         existingIdCard.setPerson(existingPerson);
 
         return personRepository.save(existingPerson);

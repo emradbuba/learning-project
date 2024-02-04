@@ -1,7 +1,5 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostCertificateRequest;
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.CertificateNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
@@ -34,14 +32,14 @@ public class EmploymentCertificateService {
     }
 
     @Transactional
-    public Person addCertificateToPerson(Long personId, PostCertificateRequest postCertificateRequest) {
+    public Person addCertificateToPerson(Long personId, EmploymentCertificate employmentCertificateFromRequest) {
         Person existingPerson = getPersonByIdOrThrow(personId);
 
         EmploymentCertificate newCertificate = new EmploymentCertificate();
         newCertificate.setPerson(existingPerson);
-        newCertificate.setCompanyName(postCertificateRequest.getCompanyName());
-        newCertificate.setStartDate(postCertificateRequest.getStartDate());
-        newCertificate.setEndDate(postCertificateRequest.getEndDate());
+        newCertificate.setCompanyName(employmentCertificateFromRequest.getCompanyName());
+        newCertificate.setStartDate(employmentCertificateFromRequest.getStartDate());
+        newCertificate.setEndDate(employmentCertificateFromRequest.getEndDate());
 
         // As it is a new entity, it has to be persisted ("new" -> "managed" entity transition)
         // (In this case it's not required due to cascading (PERSIST/MERGE), but will not hurt)
@@ -53,15 +51,16 @@ public class EmploymentCertificateService {
 
     @Transactional
     public Person updateCertificateInPerson(Long personId, Long certificateId,
-                                            PutCertificateRequest putCertificateRequest) {
+                                            EmploymentCertificate employmentCertificateFromRequest) {
         Person existingPerson = getPersonByIdOrThrow(personId);
         EmploymentCertificate existingCertificate = getPersonCertificate(existingPerson, certificateId);
 
-        existingCertificate.setStartDate(putCertificateRequest.getStartDate());
-        existingCertificate.setEndDate(putCertificateRequest.getEndDate());
-        existingCertificate.setCompanyName(putCertificateRequest.getCompanyName());
+        existingCertificate.setStartDate(employmentCertificateFromRequest.getStartDate());
+        existingCertificate.setEndDate(employmentCertificateFromRequest.getEndDate());
+        existingCertificate.setCompanyName(employmentCertificateFromRequest.getCompanyName());
 
-        // Saving certificate/person not required as it's already managed and commit() will do the work... but we want return person...
+        // Saving certificate/person not required as it's already managed and commit() will do the work... but we want
+        // return person...
         return personRepository.save(existingPerson);
     }
 
