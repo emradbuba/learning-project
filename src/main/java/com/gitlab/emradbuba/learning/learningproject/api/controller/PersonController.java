@@ -1,5 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
+import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostNewPersonRequestConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutExistingPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class PersonController {
     private final PersonService personService;
+    private final PostNewPersonRequestConverter postNewPersonRequestConverter;
+    private final PutExistingPersonRequestConverter putExistingPersonRequestConverter;
 
     @GetMapping("/{personId}")
     public ResponseEntity<Person> getPerson(@PathVariable("personId") Long personId) {
@@ -22,13 +26,15 @@ public class PersonController {
 
     @PostMapping
     public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
-        return new ResponseEntity<>(personService.createNewPerson(postNewPersonRequest), HttpStatus.CREATED);
+        Person newPersonFromRequest = postNewPersonRequestConverter.toBusinessModel(postNewPersonRequest);
+        return new ResponseEntity<>(personService.createNewPerson(newPersonFromRequest), HttpStatus.CREATED);
     }
 
     @PutMapping("/{personId}")
     public ResponseEntity<Person> updateExistingPerson(@RequestBody PutExistingPersonRequest putExistingPersonRequest,
                                                        @PathVariable("personId") Long personId) {
-        return new ResponseEntity<>(personService.updateExistingPerson(personId, putExistingPersonRequest), HttpStatus.OK);
+        Person personFromRequest = putExistingPersonRequestConverter.toBusinessModel(putExistingPersonRequest);
+        return new ResponseEntity<>(personService.updateExistingPerson(personId, personFromRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{personId}")

@@ -1,5 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
+import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PostIdCardRequestConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PutIdCardRequestConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class IdCardController {
 
     private final IdCardService idCardService;
+    private final PostIdCardRequestConverter postIdCardRequestConverter;
+    private final PutIdCardRequestConverter putIdCardRequestConverter;
 
     @GetMapping("/person/{personId}")
     public ResponseEntity<IdCard> getPersonIdCard(@PathVariable("personId") Long personId) {
@@ -28,8 +32,9 @@ public class IdCardController {
     @PostMapping("/person/{personId}")
     public ResponseEntity<Person> addPersonIdCard(@PathVariable("personId") Long personId,
                                                   @RequestBody PostIdCardRequest postIdCardRequest) {
+        final IdCard idCardFromRequest = postIdCardRequestConverter.toBusinessModel(postIdCardRequest);
         return new ResponseEntity<>(
-                idCardService.addIdCardToPerson(personId, postIdCardRequest),
+                idCardService.addIdCardToPerson(personId, idCardFromRequest),
                 HttpStatus.CREATED
         );
     }
@@ -37,7 +42,8 @@ public class IdCardController {
     @PutMapping("/person/{personId}")
     public ResponseEntity<Person> updatePersonIdCard(@PathVariable("personId") Long personId,
                                                      @RequestBody PutIdCardRequest putIdCardRequest) {
-        return ResponseEntity.ok(idCardService.updateIdCardInPerson(personId, putIdCardRequest));
+        final IdCard idCardFromRequest = putIdCardRequestConverter.toBusinessModel(putIdCardRequest);
+        return ResponseEntity.ok(idCardService.updateIdCardInPerson(personId, idCardFromRequest));
     }
 
     @DeleteMapping("/person/{personId}")

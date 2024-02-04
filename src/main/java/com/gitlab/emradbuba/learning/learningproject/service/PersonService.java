@@ -1,15 +1,11 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostNewPersonRequest;
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutExistingPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
 
 @Service
 @AllArgsConstructor
@@ -23,22 +19,17 @@ public class PersonService {
     }
 
     @Transactional
-    public Person createNewPerson(PostNewPersonRequest postNewPersonRequest) {
-        Person newPerson = new Person();
-        newPerson.setFirstName(postNewPersonRequest.getFirstName());
-        newPerson.setSurname(postNewPersonRequest.getSurname());
-        newPerson.setDateOfBirth(postNewPersonRequest.getDateOfBirth());
-        newPerson.setCertificates(Collections.emptySet());
+    public Person createNewPerson(Person newPerson) {
         return personRepository.save(newPerson);
     }
 
     @Transactional
-    public Person updateExistingPerson(Long personId, PutExistingPersonRequest putExistingPersonRequest) {
+    public Person updateExistingPerson(Long personId, Person personWithUpdateData) {
         Person existingPerson = personRepository.findById(personId)
                 .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personId));
-        existingPerson.setFirstName(putExistingPersonRequest.getFirstName());
-        existingPerson.setSurname(putExistingPersonRequest.getSurname());
-        existingPerson.setDateOfBirth(putExistingPersonRequest.getDateOfBirth());
+        existingPerson.setFirstName(personWithUpdateData.getFirstName());
+        existingPerson.setSurname(personWithUpdateData.getSurname());
+        existingPerson.setDateOfBirth(personWithUpdateData.getDateOfBirth());
         return personRepository.save(existingPerson);
     }
 
