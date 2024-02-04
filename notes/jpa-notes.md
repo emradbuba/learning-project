@@ -2,6 +2,7 @@
 This nice [YouTube](https://www.youtube.com/playlist?list=PLEocw3gLFc8UYNv0uRG399GSggi8icTL6) playlist goes through most of material in this small project.
 
 ### TODO
+> * Using LOMBOK with `@Entity` classes
 > * Entity lifecycle: Create more details descriptions and use cases
 > * Pid generation -> select FOR UPDATE - set lock on the table (perimistic lock)"
 > * How to create JPA Entities from existing database
@@ -589,7 +590,7 @@ For "single field" dependencies like `Person` and `IdCard`, in asked for a `Pers
 If set to `FetchType.LAZY` - only when `IdCard` is first used
 </details>
 
-### <code>orphanRemoval</code> attirbute in <code>@OneToMany</code> relation: 
+### About <code>orphanRemoval</code> in <code>@OneToMany</code> relation: 
 Nice explanation: [Vladmihalcea blog post](https://vladmihalcea.com/orphanremoval-jpa-hibernate/)
 Example: 
 ```java
@@ -609,6 +610,12 @@ public void removeCertificate(EmployeeCertificate cert) {
     // commit...
 }
 ```
+
+### Using lombok with <code>@Entity</code> classes
+
+
+### Other topics
+
 <details>
 <summary>What the role of <code>orphanRemoval</code>?</summary>
 
@@ -631,4 +638,4 @@ public void removeCertificate(EmployeeCertificate cert) {
 > those changes will be persisted to the database, regardless of the fact of invoking the `save` or `update` methods.
 </details>
 
-[link text](notes/READ.md)
+
