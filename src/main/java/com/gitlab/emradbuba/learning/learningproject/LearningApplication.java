@@ -1,13 +1,13 @@
-package com.gitlab.emradbuba.learning.jpa.basicjpacrud;
+package com.gitlab.emradbuba.learning.learningproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BasicJpaCrudApplication {
+public class LearningApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BasicJpaCrudApplication.class, args);
+		SpringApplication.run(LearningApplication.class, args);
 	}
 
 }

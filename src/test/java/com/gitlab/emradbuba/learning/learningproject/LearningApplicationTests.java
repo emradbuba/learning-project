@@ -1,10 +1,10 @@
-package com.gitlab.emradbuba.learning.jpa.basicjpacrud;
+package com.gitlab.emradbuba.learning.learningproject;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BasicJpaCrudApplicationTests {
+class LearningApplicationTests {
 
 	@Test
 	void contextLoads() {
