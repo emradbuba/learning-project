@@ -1,5 +1,6 @@
-package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
+package com.gitlab.emradbuba.learning.learningproject.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,8 @@ public class IdCard {
     @Column(name = "PUBLISHER")
     @NotNull
     private String publishedBy;
- }
+
+    @OneToOne(mappedBy = "idCard")
+    @JsonBackReference
+    private Person person;
+}

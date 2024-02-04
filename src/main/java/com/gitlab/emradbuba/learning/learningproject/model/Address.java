@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.jpa.basicjpacrud.model;
+package com.gitlab.emradbuba.learning.learningproject.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "ADDRESS")
@@ -27,4 +29,7 @@ public class Address {
     private String city;
     @NotNull
     private String country;
+
+//    @ManyToMany(mappedBy = "addresses")
+//    private Set<Person> persons;
 }
