@@ -611,8 +611,24 @@ public void removeCertificate(EmployeeCertificate cert) {
 }
 ```
 
-### Using lombok with <code>@Entity</code> classes
+### Lombok pitfalls with <code>@Entity</code> classes
+<details>
+<summary>Using <code>@Data</code>/<code>@EqualsAndHashCode</code> annotation with <code>@Entity</code> class</summary>
 
+> These annotations generate equals/hashCode using entity fields which are, by design, mutable. It can destroy HashSets. 
+</details>
+
+<details>
+<summary>Using <code>@ToString</code> with <code>Entity</code> classes</summary>
+
+> `@ToString`, same as `@EqualsAndHashCode` reference fields in class, which may lead to broken lazy initialization - invoking the toString may result in loading all data from database which was supposed to be loaded later on demand. 
+</details>
+
+<details>
+<summary>Missing non-arg constructor</summary>
+
+> Non args is required by entites in JPA, but adding for example `@Builder` - it should always be added by `@NoArgsContructor`
+</details>
 
 ### Other topics
 
