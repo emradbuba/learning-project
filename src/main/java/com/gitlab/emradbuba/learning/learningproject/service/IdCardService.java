@@ -1,5 +1,10 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
+import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.IdCardEntityToIdCardConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardAlreadyExistsAppException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardDoesNotExistAppException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
@@ -7,6 +12,8 @@ import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.IdCardRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
+import com.gitlab.emradbuba.learning.learningproject.persistance.model.IdCardEntity;
+import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,60 +25,71 @@ import java.util.Optional;
 public class IdCardService {
     private final PersonRepository personRepository;
     private final IdCardRepository idCardRepository;
+    private final IdCardEntityToIdCardConverter idCardEntityToIdCardConverter;
+    private final PersonEntityToPersonConverter personEntityToPersonConverter;
 
-    public Optional<IdCard> getIdCardFromPerson(Long personId) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        return Optional.ofNullable(existingPerson.getIdCard());
+    public Optional<IdCard> getIdCardFromPerson(String personBusinessId) {
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        return Optional.ofNullable(existingPersonEntity.getIdCard())
+                .map(idCardEntityToIdCardConverter::fromIdCardEntity);
     }
 
     @Transactional
-    public Person addIdCardToPerson(Long personId, IdCard idCard) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        IdCard existingIdCard = existingPerson.getIdCard();
-        if (existingIdCard != null) {
-            throw new IdCardAlreadyExistsAppException("IdCard already exists for person with id: " + personId);
+    public Person addIdCardToPerson(AddNewIdCardCommand addNewIdCardCommand) {
+        String personBusinessId = addNewIdCardCommand.getPersonBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        IdCardEntity existingIdCardEntity = existingPersonEntity.getIdCard();
+        if (existingIdCardEntity != null) {
+            throw new IdCardAlreadyExistsAppException("IdCard already exists for person with businessId: " + personBusinessId);
         }
-        IdCard newIdCard = new IdCard();
-        newIdCard.setSerialNumber(idCard.getSerialNumber());
-        newIdCard.setValidUntil(idCard.getValidUntil());
-        newIdCard.setPublishedBy(idCard.getPublishedBy());
-        newIdCard.setPerson(existingPerson);
+        String idCardBusinessId = BusinessIdUtils.generateBusinessId();
+        IdCardEntity newIdCardEntity = new IdCardEntity();
+        newIdCardEntity.setBusinessId(idCardBusinessId);
+        newIdCardEntity.setSerialNumber(addNewIdCardCommand.getSerialNumber());
+        newIdCardEntity.setValidUntil(addNewIdCardCommand.getValidUntil());
+        newIdCardEntity.setPublishedBy(addNewIdCardCommand.getPublishedBy());
+        newIdCardEntity.setPerson(existingPersonEntity);
 
-        existingPerson.setIdCard(newIdCard);
-        return personRepository.save(existingPerson); // <-- Cascade.PERSIST will also persist a newly created IdCard
-        // entity
+        existingPersonEntity.setIdCard(newIdCardEntity);
+        // vv Cascade.PERSIST will also persist a newly created IdCardEntity vv
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
     @Transactional
-    public Person updateIdCardInPerson(Long personId, IdCard idCardFromRequest) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        IdCard existingIdCard = existingPerson.getIdCard();
-        if (existingIdCard == null) {
-            throw new IdCardDoesNotExistAppException("IdCard does not exist for person with id: " + personId);
-        }
-        existingIdCard.setSerialNumber(idCardFromRequest.getSerialNumber());
-        existingIdCard.setValidUntil(idCardFromRequest.getValidUntil());
-        existingIdCard.setPublishedBy(idCardFromRequest.getPublishedBy());
-        existingIdCard.setPerson(existingPerson);
+    public Person updateIdCardInPerson(UpdateExistingIdCardCommand updateExistingIdCardCommand) {
+        String personBusinessId = updateExistingIdCardCommand.getPersonBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        IdCardEntity existingIdCardEntity = Optional.ofNullable(existingPersonEntity.getIdCard())
+                .orElseThrow(() -> new IdCardDoesNotExistAppException("IdCard does not exist for person with businessId:" +
+                        " " + personBusinessId));
+        existingIdCardEntity.setSerialNumber(updateExistingIdCardCommand.getSerialNumber());
+        existingIdCardEntity.setValidUntil(updateExistingIdCardCommand.getValidUntil());
+        existingIdCardEntity.setPublishedBy(updateExistingIdCardCommand.getPublishedBy());
+        existingIdCardEntity.setPerson(existingPersonEntity);
+        existingPersonEntity.setIdCard(existingIdCardEntity);
 
-        return personRepository.save(existingPerson);
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
     @Transactional
-    public Person deleteIdCardFromPerson(Long personId) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        IdCard idCardToDelete = existingPerson.getIdCard();
-        if (idCardToDelete != null) {
-            existingPerson.setIdCard(null); // orphanRemoval "true" would remove idCard as it has no more references...
-            idCardRepository.delete(idCardToDelete); // (without orphanRemoval this is necessary)
-            return personRepository.save(existingPerson);
+    public Person deleteIdCardFromPerson(String personBusinessId) {
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        IdCardEntity idCardEntityToDelete = existingPersonEntity.getIdCard();
+        if (idCardEntityToDelete != null) {
+            existingPersonEntity.setIdCard(null); // orphanRemoval "true" would remove idCard as it has no more
+            // references...
+            idCardRepository.delete(idCardEntityToDelete); // (without orphanRemoval this is necessary)
+            PersonEntity personEntityAfterChages = personRepository.save(existingPersonEntity);
+            return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChages);
         }
-        throw new PersonNotFoundAppException("No person found for given personId: " + personId);
+        throw new PersonNotFoundAppException("No person found for given businessId: " + personBusinessId);
     }
 
-    private Person getPersonByIdOrThrow(Long personId) {
+    private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
-                .findById(personId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personId));
+                .findByBusinessId(personBusinessId)
+                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given businessId: " + personBusinessId));
     }
 }
