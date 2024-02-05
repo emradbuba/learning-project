@@ -40,4 +40,8 @@ public class PersonService {
         }
         personRepository.deleteById(personId);
     }
+
+    public long countPerson() {
+        return personRepository.count();
+    }
 }
