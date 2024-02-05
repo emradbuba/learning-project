@@ -1,20 +1,28 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
+import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.CertificateNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.CertRepo;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
+import com.gitlab.emradbuba.learning.learningproject.persistance.model.EmploymentCertificateEntity;
+import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.CertificateEntityToCertificateConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -22,84 +30,100 @@ import java.util.Optional;
 public class EmploymentCertificateService {
     private final PersonRepository personRepository;
     private final CertRepo certRepo;
+    private final CertificateEntityToCertificateConverter certificateEntityToCertificateConverter;
+    private final PersonEntityToPersonConverter personEntityToPersonConverter;
 
-    public List<EmploymentCertificate> getCertificatesFromPerson(Long personId) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        return new ArrayList<>(
-                Optional.ofNullable(existingPerson.getCertificates())
-                        .orElse(Collections.emptySet())
-        );
+    public List<EmploymentCertificate> getCertificatesFromPerson(String personBusinessId) {
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+
+        Set<EmploymentCertificateEntity> certificateEntities = Optional.ofNullable(existingPersonEntity.getCertificates())
+                .orElse(Collections.emptySet());
+
+        return certificateEntities.stream()
+                .map(certificateEntityToCertificateConverter::fromCertificateEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Person addCertificateToPerson(Long personId, EmploymentCertificate employmentCertificateFromRequest) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
+    public Person addCertificateToPerson(AddNewCertificateCommand addNewCertificateCommand) {
+        final String newBusinessId = BusinessIdUtils.generateBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(addNewCertificateCommand.getPersonBusinessId());
 
-        EmploymentCertificate newCertificate = new EmploymentCertificate();
-        newCertificate.setPerson(existingPerson);
-        newCertificate.setCompanyName(employmentCertificateFromRequest.getCompanyName());
-        newCertificate.setStartDate(employmentCertificateFromRequest.getStartDate());
-        newCertificate.setEndDate(employmentCertificateFromRequest.getEndDate());
+        EmploymentCertificateEntity newCertificateEntity = new EmploymentCertificateEntity();
+        newCertificateEntity.setBusinessId(newBusinessId);
+        newCertificateEntity.setPerson(existingPersonEntity);
+        newCertificateEntity.setCompanyName(addNewCertificateCommand.getCompanyName());
+        newCertificateEntity.setStartDate(addNewCertificateCommand.getStartDate());
+        newCertificateEntity.setEndDate(addNewCertificateCommand.getEndDate());
 
         // As it is a new entity, it has to be persisted ("new" -> "managed" entity transition)
         // (In this case it's not required due to cascading (PERSIST/MERGE), but will not hurt)
-        certRepo.save(newCertificate);
-        existingPerson.getCertificates().add(newCertificate);
+        certRepo.save(newCertificateEntity);
+        existingPersonEntity.getCertificates().add(newCertificateEntity);
 
-        return personRepository.save(existingPerson);
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
     @Transactional
-    public Person updateCertificateInPerson(Long personId, Long certificateId,
-                                            EmploymentCertificate employmentCertificateFromRequest) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        EmploymentCertificate existingCertificate = getPersonCertificate(existingPerson, certificateId);
+    public Person updateCertificateInPerson(UpdateExistingCertificateCommand updateExistingCertificateCommand) {
+        final String personBusinessId = updateExistingCertificateCommand.getPersonBusinessId();
+        final String certificateBusinessId = updateExistingCertificateCommand.getCertificateBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        EmploymentCertificateEntity existingCertificateEntity = getPersonCertificate(existingPersonEntity,
+                certificateBusinessId);
 
-        existingCertificate.setStartDate(employmentCertificateFromRequest.getStartDate());
-        existingCertificate.setEndDate(employmentCertificateFromRequest.getEndDate());
-        existingCertificate.setCompanyName(employmentCertificateFromRequest.getCompanyName());
+        existingCertificateEntity.setStartDate(updateExistingCertificateCommand.getStartDate());
+        existingCertificateEntity.setEndDate(updateExistingCertificateCommand.getEndDate());
+        existingCertificateEntity.setCompanyName(updateExistingCertificateCommand.getCompanyName());
 
         // Saving certificate/person not required as it's already managed and commit() will do the work... but we want
         // return person...
-        return personRepository.save(existingPerson);
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
     @Transactional
-    public Person deleteCertificateFromPerson(Long personId, Long certificateId) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
-        EmploymentCertificate certificateToDelete = getPersonCertificate(existingPerson, certificateId);
-        existingPerson.getCertificates().remove(certificateToDelete);
+    public Person deleteCertificateFromPerson(String personBusinessId, String certificateBusinessId) {
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        EmploymentCertificateEntity certificateEntityToDelete = getPersonCertificate(existingPersonEntity,
+                certificateBusinessId);
+        existingPersonEntity.getCertificates().remove(certificateEntityToDelete);
 
-        certificateToDelete.setPerson(null);
+        certificateEntityToDelete.setPerson(null);
 
-        return personRepository.save(existingPerson);
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
     @Transactional
-    public Person deleteAllCertificatesFromPerson(Long personId) {
-        Person existingPerson = getPersonByIdOrThrow(personId);
+    public Person deleteAllCertificatesFromPerson(String personBusinessId) {
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
 
-        existingPerson.getCertificates().forEach(certificate -> certificate.setPerson(null));
-        existingPerson.setCertificates(Collections.emptySet());
+        existingPersonEntity.getCertificates().forEach(certificateEntity -> certificateEntity.setPerson(null));
+        existingPersonEntity.setCertificates(Collections.emptySet());
 
-        return personRepository.save(existingPerson);
+        PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
+        return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
 
-    private Person getPersonByIdOrThrow(Long personId) {
+    private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
-                .findById(personId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personId));
+                .findByBusinessId(personBusinessId)
+                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personBusinessId));
     }
 
-    private EmploymentCertificate getPersonCertificate(Person existingPerson, Long certificateId) {
-        return existingPerson.getCertificates()
+    private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity,
+                                                             String certificateBusinessId) {
+        return existingPersonEntity.getCertificates()
                 .stream()
-                .filter(cert -> cert.getId().equals(certificateId))
+                .filter(cert -> cert.getBusinessId().equals(certificateBusinessId))
                 .findFirst()
                 .orElseThrow(() ->
                         new CertificateNotFoundException(
-                                String.format("Person with id=%s has no certificate with id=%s", existingPerson.getId(),
-                                        certificateId)
+                                String.format("Person with businessId=%s has no certificate with businessId=%s",
+                                        existingPersonEntity.getBusinessId(),
+                                        certificateBusinessId)
                         )
                 );
     }

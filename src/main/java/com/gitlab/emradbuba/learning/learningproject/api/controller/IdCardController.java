@@ -1,9 +1,11 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
-import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PostIdCardRequestConverter;
-import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PutIdCardRequestConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PostIdCardRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PutIdCardRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutIdCardRequest;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.IdCardService;
@@ -18,36 +20,37 @@ import org.springframework.web.bind.annotation.*;
 public class IdCardController {
 
     private final IdCardService idCardService;
-    private final PostIdCardRequestConverter postIdCardRequestConverter;
-    private final PutIdCardRequestConverter putIdCardRequestConverter;
+    private final PostIdCardRequestToCommandConverter postIdCardRequestToCommandConverter;
+    private final PutIdCardRequestToCommandConverter putIdCardRequestToCommandConverter;
 
-    @GetMapping("/person/{personId}")
-    public ResponseEntity<IdCard> getPersonIdCard(@PathVariable("personId") Long personId) {
+    @GetMapping("/person/{personBusinessId}")
+    public ResponseEntity<IdCard> getPersonIdCard(@PathVariable("personBusinessId") String personBusinessId) {
         return idCardService
-                .getIdCardFromPerson(personId)
+                .getIdCardFromPerson(personBusinessId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
 
-    @PostMapping("/person/{personId}")
-    public ResponseEntity<Person> addPersonIdCard(@PathVariable("personId") Long personId,
+    @PostMapping("/person/{personBusinessId}")
+    public ResponseEntity<Person> addPersonIdCard(@PathVariable("personBusinessId") String personBusinessId,
                                                   @RequestBody PostIdCardRequest postIdCardRequest) {
-        final IdCard idCardFromRequest = postIdCardRequestConverter.toBusinessModel(postIdCardRequest);
-        return new ResponseEntity<>(
-                idCardService.addIdCardToPerson(personId, idCardFromRequest),
-                HttpStatus.CREATED
-        );
+        final AddNewIdCardCommand addNewIdCardCommand = postIdCardRequestToCommandConverter
+                .toCommand(personBusinessId, postIdCardRequest);
+        final Person personAfterChanges = idCardService.addIdCardToPerson(addNewIdCardCommand);
+        return new ResponseEntity<>(personAfterChanges, HttpStatus.CREATED);
     }
 
-    @PutMapping("/person/{personId}")
-    public ResponseEntity<Person> updatePersonIdCard(@PathVariable("personId") Long personId,
+    @PutMapping("/person/{personBusinessId}")
+    public ResponseEntity<Person> updatePersonIdCard(@PathVariable("personBusinessId") String personBusinessId,
                                                      @RequestBody PutIdCardRequest putIdCardRequest) {
-        final IdCard idCardFromRequest = putIdCardRequestConverter.toBusinessModel(putIdCardRequest);
-        return ResponseEntity.ok(idCardService.updateIdCardInPerson(personId, idCardFromRequest));
+        final UpdateExistingIdCardCommand updateExistingIdCardCommand =
+                putIdCardRequestToCommandConverter.toCommand(personBusinessId, putIdCardRequest);
+        Person personAfterChanges = idCardService.updateIdCardInPerson(updateExistingIdCardCommand);
+        return ResponseEntity.ok(personAfterChanges);
     }
 
-    @DeleteMapping("/person/{personId}")
-    public ResponseEntity<Person> deletePersonIdCard(@PathVariable("personId") Long personId) {
-        return ResponseEntity.ok(idCardService.deleteIdCardFromPerson(personId));
+    @DeleteMapping("/person/{personBusinessId}")
+    public ResponseEntity<Person> deletePersonIdCard(@PathVariable("personBusinessId") String personBusinessId) {
+        return ResponseEntity.ok(idCardService.deleteIdCardFromPerson(personBusinessId));
     }
 }

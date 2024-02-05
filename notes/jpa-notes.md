@@ -242,7 +242,7 @@ public class Person {
     
   @OneToOne
   @JoinColumn(name = "ID_CARD_ID") // <-- customize the join column name in database
-  private IdCard idCard;
+  private IdCard idCardEntity;
 
 }
 ```
@@ -254,14 +254,14 @@ public class IdCardService {
     
     public Person addIdCardToPerson(Long personId, PostIdCardRequest postIdCardDtoRequest) {
         //...
-        IdCard idCard = new IdCard();
-        idCard.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
-        idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
-        idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
+        IdCard idCardEntity = new IdCard();
+        idCardEntity.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
+        idCardEntity.setValidUntil(postIdCardDtoRequest.getValidUntil());
+        idCardEntity.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
 
-        existingPerson.setIdCard(idCard);
-        idCardRepository.save(idCard); // no cascading, so we need to persist this entity too...
-        return personRepository.save(existingPerson);
+        existingPersonEntity.setIdCard(idCardEntity);
+        idCardRepository.save(idCardEntity); // no cascading, so we need to persist this entity too...
+        return personRepository.save(existingPersonEntity);
     }
 }
 ```
@@ -269,29 +269,29 @@ public class IdCardService {
 Delete logic: 
 ```java
 public Person deleteIdCardFromPerson(Long personId) {
-    Person existingPerson = getPersonByIdOrThrow(personId);
-    if (existingPerson.getIdCard() != null) {
-        existingPerson.setIdCard(null); // <-- !
-        return personRepository.save(existingPerson);
+    Person existingPersonEntity = getPersonByIdOrThrow(personId);
+    if (existingPersonEntity.getIdCard() != null) {
+        existingPersonEntity.setIdCard(null); // <-- !
+        return personRepository.save(existingPersonEntity);
     }
-    throw new PersonNotFoundAppException("No person found for given personId: " + personId);
+    throw new PersonNotFoundAppException("No personEntity found for given personId: " + personId);
 }
 ```
 
 <details>
-<summary>Will above example remove the <code>idCard</code> from database?</summary>
+<summary>Will above example remove the <code>idCardEntity</code> from database?</summary>
 
-No - there default `orphanRemoval` is set to `false`, so when existing `idCard` in "unrelated" from person (setting `null`) it is still in database
+No - there default `orphanRemoval` is set to `false`, so when existing `idCardEntity` in "unrelated" from personEntity (setting `null`) it is still in database
 `orphanRemoval` - `false` allows to *preserve* an entry in the database ***even if parent is removed***
 It will be changed if we modify relation:
 
 ```java
 @OneToOne(orphanRemoval = true)
 @JoinColumn(name = "ID_CARD_ID")
-private IdCard idCard;
+private IdCard idCardEntity;
 ```
 
-Now, when idCard is set to `null` in person, the orphaned `idCard` is also removed from database as it's not referenced any more
+Now, when idCardEntity is set to `null` in personEntity, the orphaned `idCardEntity` is also removed from database as it's not referenced any more
 
 </details>
 
@@ -302,25 +302,25 @@ No, we can use cascading in this case... Let's assume:
 ```java
 @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
 @JoinColumn(name = "ID_CARD_ID")
-private IdCard idCard;
+private IdCard idCardEntity;
 ```
-It says: *"if you persist the `Person` persist also `IdCard`"* so we can remove the extra `idCardRepository.save(idCard)`':
+It says: *"if you persist the `Person` persist also `IdCard`"* so we can remove the extra `idCardRepository.save(idCardEntity)`':
 ```java
  public Person addIdCardToPerson(Long personId, PostIdCardRequest postIdCardDtoRequest) {
         // ...
-        IdCard idCard = new IdCard();
-        idCard.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
-        idCard.setValidUntil(postIdCardDtoRequest.getValidUntil());
-        idCard.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
+        IdCard idCardEntity = new IdCard();
+        idCardEntity.setSerialNumber(postIdCardDtoRequest.getSerialNumber());
+        idCardEntity.setValidUntil(postIdCardDtoRequest.getValidUntil());
+        idCardEntity.setPublishedBy(postIdCardDtoRequest.getPublishedBy());
         
-        existingPerson.setIdCard(idCard);
-        return personRepository.save(existingPerson); // <-- idCard will also be persisted
+        existingPersonEntity.setIdCard(idCardEntity);
+        return personRepository.save(existingPersonEntity); // <-- idCardEntity will also be persisted
     }
 ```
 without cascading we would see
 > *org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing*
 
-as we want to persist a `Person` which has `idCard` not present in database
+as we want to persist a `Person` which has `idCardEntity` not present in database
 
 </details>
 
@@ -335,8 +335,8 @@ From stackoverflow: https://stackoverflow.com/questions/4329577/how-does-jpa-orp
 
 > In other words, it about disconnecting the relation between objects in JPA. So: 
 > ```java
-> person.setIdCard(null);
-> person.save();
+> personEntity.setIdCard(null);
+> personEntity.save();
 > ```
 > will remove previously assigned `IdCard` only if `orphanRemoval` is `true`. Otherwise, event if `cascade=REMOVE` is set, it will not take place as setting a `null` idcard is not a removal of a `Person`.
 </details>
@@ -347,22 +347,22 @@ Work in both directions
 
 Add @OneToOne on the other side (in this case in IdCard)
 ```java
-    @OneToOne(mappedBy = "idCard")
+    @OneToOne(mappedBy = "idCardEntity")
     @JsonBackReference
-    private Person person;
+    private Person personEntity;
 ```
 When adding to context --> add both dependencies in both directions (probably will work but not guaranteed)
 ```java
     // ...
-    IdCard idCard = existingPerson.getIdCard();
-    idCard.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
-    idCard.setValidUntil(putIdCardDtoRequest.getValidUntil());
-    idCard.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
+    IdCard idCardEntity = existingPersonEntity.getIdCard();
+    idCardEntity.setSerialNumber(putIdCardDtoRequest.getSerialNumber());
+    idCardEntity.setValidUntil(putIdCardDtoRequest.getValidUntil());
+    idCardEntity.setPublishedBy(putIdCardDtoRequest.getPublishedBy());
     
-    idCard.setPerson(existingPerson); // \ 
-    existingPerson.setIdCard(idCard); // /
+    idCardEntity.setPerson(existingPersonEntity); // \ 
+    existingPersonEntity.setIdCard(idCardEntity); // /
     
-    return personRepository.save(existingPerson); // PERSIST cascade will also persist the IdCard
+    return personRepository.save(existingPersonEntity); // PERSIST cascade will also persist the IdCard
 ```
 
 
@@ -399,7 +399,7 @@ public class EmploymentCertificate {
 
     @ManyToOne
     @JoinColumn("person_id") // <-- not necessary, it would be default behaviour
-    private Person person;
+    private Person personEntity;
 }
 ```
 </details>
@@ -442,19 +442,19 @@ public class Person {
 
 #### Bidirectional relationship
 ```java
-@OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+@OneToMany(mappedBy = "personEntity", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 private Set<EmploymentCertificate> certificates;
 ```
 ```java
 @ManyToOne
 @JoinColumn(name = "post")
-private Person person;
+private Person personEntity;
 ```
 
 * Important:
   * *mappedBy* - in bidirectional relations always use it (on non-owner side)
   * *setting bidirectional relation in context* - Always (if not cascaded) add both relation "directions". It could work without it, but it not guaranted by ORM.
-  * *cascading* - we say 'if you persist person, persist also certificates'
+  * *cascading* - we say 'if you persist personEntity, persist also certificates'
     * Depending on the side of relation we may want to define different cascading rules
 
 <details>
@@ -594,15 +594,15 @@ If set to `FetchType.LAZY` - only when `IdCard` is first used
 Nice explanation: [Vladmihalcea blog post](https://vladmihalcea.com/orphanremoval-jpa-hibernate/)
 Example: 
 ```java
-@OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.MERGE} /*, orphanRemoval=true */)
+@OneToMany(mappedBy = "personEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE} /*, orphanRemoval=true */)
 private Set<EmploymentCertificate> certificates;
 ```
 and
 ```java
 @ManyToOne
-private Person person;
+private Person personEntity;
 ```
-When we delete a person by id: 
+When we delete a personEntity by id: 
 ```java
 public void removeCertificate(EmployeeCertificate cert) {
     certificatesInPerson.remove(cert);

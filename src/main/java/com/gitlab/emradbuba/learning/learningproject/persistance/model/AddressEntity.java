@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.model;
+package com.gitlab.emradbuba.learning.learningproject.persistance.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,15 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Entity
 @Table(name = "ADDRESS")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
-public class Address {
+public class AddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
