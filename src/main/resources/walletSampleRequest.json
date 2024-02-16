@@ -1,0 +1,21 @@
+{
+  "walletName": "my-personal-wallet",
+  "uuidNumber": "cb5bf962-9d43-42cf-b1af-23b44403a788",
+  "creditCards":[
+    {
+      "creditCardType": "VISA",
+      "creditCardNumber" : "1111-2222-3333-4444",
+      "creditLimit": 4000
+    },
+    {
+      "creditCardType": "MAESTRO",
+      "creditCardNumber" : "9999-4444-3333-2222",
+      "creditLimit": 9999
+    }
+  ],
+  "drivingLicenseDto": {
+    "category":"A",
+    "creationDate":"2023-10-04",
+    "validityDate":"2025-12-31"
+  }
+}
