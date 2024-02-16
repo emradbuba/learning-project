@@ -8,6 +8,7 @@ import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAp
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -13,6 +13,7 @@ This nice [YouTube](https://www.youtube.com/playlist?list=PLEocw3gLFc8UYNv0uRG39
 * https://www.objectdb.com/java/jpa/getting/started
 * https://itecnote.com/tecnote/java-jpa-onetomany-not-deleting-child/
 * https://stackoverflow.com/questions/10394857/how-to-use-transactional-with-spring-data
+* https://jpa-buddy.com/blog/lombok-and-jpa-what-may-go-wrong
 
 ### Basic notes
 
@@ -629,6 +630,8 @@ public void removeCertificate(EmployeeCertificate cert) {
 
 > Non args is required by entites in JPA, but adding for example `@Builder` - it should always be added by `@NoArgsContructor`
 </details>
+
+For details see this [JPA Buddy article](https://jpa-buddy.com/blog/lombok-and-jpa-what-may-go-wrong/).
 
 ### Other topics
 

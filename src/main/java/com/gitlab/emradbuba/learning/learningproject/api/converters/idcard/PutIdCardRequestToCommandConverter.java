@@ -4,13 +4,15 @@ import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutIdCard
 import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
 import org.springframework.stereotype.Component;
 
+import static com.gitlab.emradbuba.learning.learningproject.api.converters.MappingUtils.normalizeString;
+
 @Component
 public class PutIdCardRequestToCommandConverter {
     public UpdateExistingIdCardCommand toCommand(String personBusinessId, PutIdCardRequest putIdCardRequest) {
         return UpdateExistingIdCardCommand.builder()
-                .personBusinessId(personBusinessId)
-                .publishedBy(putIdCardRequest.getPublishedBy())
-                .serialNumber(putIdCardRequest.getSerialNumber())
+                .personBusinessId(normalizeString(personBusinessId))
+                .publishedBy(normalizeString(putIdCardRequest.getPublishedBy()))
+                .serialNumber(normalizeString(putIdCardRequest.getSerialNumber()))
                 .validUntil(putIdCardRequest.getValidUntil())
                 .build();
     }

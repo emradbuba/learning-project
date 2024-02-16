@@ -4,10 +4,11 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostN
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutExistingPersonRequest;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
+    public ResponseEntity<Person> createNewPerson(@RequestBody @Valid PostNewPersonRequest postNewPersonRequest) {
         AddNewPersonCommand addNewPersonCommand = postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
         Person newlyCreatedPerson = personService.storeNewPerson(addNewPersonCommand);
         return new ResponseEntity<>(newlyCreatedPerson, HttpStatus.CREATED);
