@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.gitlab.emradbuba.learning</groupId>
 	<artifactId>learningproject</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>learning-project</name>
 	<description>Demo project for learning SpringBoot</description>
 	<properties>
