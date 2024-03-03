@@ -1,6 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.api.converters.person;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutExistingPersonRequest;
+import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
 import org.springframework.stereotype.Component;
 

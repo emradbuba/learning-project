@@ -1,4 +1,4 @@
-## Something about Spring Actuator
+## Spring Actuator - basic notes
 Possible endpoint config: 
 * enable / disable
 * expose or not
