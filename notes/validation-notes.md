@@ -1,4 +1,4 @@
-## About validation
+## Spring validation - basic notes
 
 --------
 ### Resources: 

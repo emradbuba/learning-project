@@ -1,6 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.api.converters.certificate;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.PutCertificateRequest;
+import com.gitlab.emradbuba.learning.learningproject.api.model.request.certificate.PutCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingCertificateCommand;
 import org.springframework.stereotype.Component;
 

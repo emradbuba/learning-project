@@ -1,4 +1,4 @@
-## Sample JPA Project
+## Using Spring JPA - basic notes
 This nice [YouTube](https://www.youtube.com/playlist?list=PLEocw3gLFc8UYNv0uRG399GSggi8icTL6) playlist goes through most of material in this small project.
 
 ### TODO

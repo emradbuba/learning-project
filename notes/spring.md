@@ -1,4 +1,4 @@
-## About controllers and JSON in SpringBoot
+## SpringBoot related knowledge
 
 <details>
 <summary>What's the difference between <code>@Controller</code> and <code>@RestController</code>?</summary>
@@ -28,3 +28,6 @@
 > will constituate a body of the response, which will be transformed to JSON/XML according 
 > to `produces` attribute. 
 </details>
+
+### TODO
+* What does the `@Configuration` annotation mean? 
