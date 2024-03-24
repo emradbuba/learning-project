@@ -30,4 +30,5 @@
 </details>
 
 ### TODO
-* What does the `@Configuration` annotation mean? 
+* What does the `@Configuration` annotation mean?
+* `ContextLoaderListener` used to load Spring beans

@@ -1,19 +1,20 @@
 package com.gitlab.emradbuba.learning.learningproject.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
-
 @Configuration
 public class SwaggerConfig {
+
+    private static final String BASIC_AUTH_SCHEME_NAME = "basicAuth";
+    private static final String BASIC_AUTH_SCHEME = "basic";
 
     @Value("${app.version:unknown}")
     private String projectVersion;
@@ -31,6 +32,19 @@ public class SwaggerConfig {
                 .externalDocs(new ExternalDocumentation()
                         .description("Official OpenAPI documentation")
                         .url("https://swagger.io/specification/")
-                );
+                )
+                .components(new Components()
+                        .addSecuritySchemes(BASIC_AUTH_SCHEME_NAME, createSecurityScheme())
+                )
+                .addSecurityItem(new SecurityRequirement()
+                        .addList(BASIC_AUTH_SCHEME_NAME));
+    }
+
+    private SecurityScheme createSecurityScheme() {
+        return new SecurityScheme()
+                .name(BASIC_AUTH_SCHEME_NAME)
+                .type(SecurityScheme.Type.HTTP)
+                .in(SecurityScheme.In.HEADER)
+                .scheme(BASIC_AUTH_SCHEME);
     }
 }
