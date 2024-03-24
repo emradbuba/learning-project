@@ -1,7 +1,65 @@
 ## Spring Actuator - basic notes
+---------------------
+### Basics & Demo
+Actuator can give us many information about the application. It has many endpoint configured out of
+the box we can just use, like `/actuator/info` endpoints. 
+
+We, as developers, can use it, configure it, like 
+by saying which info should be visible or not, or even add our own `InfoContributor` which adds 
+extra information for default actuator's info response. 
+
+We can also say "in health endpoint don't include information about enabled java":
+> `management.info.java.enabled=false`
+
+or "set url to info to 'appinfo'":
+> `management.endpoints.web.path-mapping.info=/appinfo`
+
+#### Example
+An example of `/actuator/info` endpoint including extra `"personInfo"` section added by `InfoContributor`:
+```json
+{
+"app": {
+  "description": "Sample static info"
+},
+"build": {
+  "version": "1.0.0-SNAPSHOT"
+},
+"custom": {
+  "static": {
+    "information": "This is the custom info from actuator"
+  }
+},
+"java": {
+  "version": "17.0.5",
+  "vendor": {
+    "name": "Eclipse Adoptium",
+    "version": "Temurin-17.0.5+8"
+  },
+  "runtime": {
+    "name": "OpenJDK Runtime Environment",
+    "version": "17.0.5+8"
+  },
+  "jvm": {
+    "name": "OpenJDK 64-Bit Server VM",
+    "vendor": "Eclipse Adoptium",
+    "version": "17.0.5+8"
+  }
+},
+"personInfo": {
+  "description": "This is the custom info from actuator",
+  "version": "1.0.0-SNAPSHOT",
+  "personCount": "0"
+}
+}
+```
+
+
+
+### More information
+
 Possible endpoint config: 
-* enable / disable
-* expose or not
+* "enable" / "disable"
+* "expose" or "do not expose"
 
 <details>
 <summary>When endpoint is autoconfigured? </summary>
