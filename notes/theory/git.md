@@ -1,6 +1,8 @@
 ## Git
 
 ### git fetch --prune
+(Nice explanation: https://stackoverflow.com/a/47939403/1534456)
+
 Removing branches which no longer exist on remote repo.
 <details>
 <summary>In such case how many branches are we considering indeed? </summary>
