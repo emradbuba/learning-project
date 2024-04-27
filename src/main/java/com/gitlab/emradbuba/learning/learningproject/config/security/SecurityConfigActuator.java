@@ -10,7 +10,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.gitlab.emradbuba.learning.learningproject.libs.whitelist.UsernamesWhitelistProvider.DEFAULT_WHITELIST_ROLENAME;
+import static com.gitlab.emradbuba.learning.learningproject.config.security.SecurityConfigRestApi.ADMIN_ROLE_NAME;
+import static com.gitlab.emradbuba.learning.learningproject.config.security.SecurityConfigRestApi.USER_ROLE_NAME;
+import static com.gitlab.emradbuba.learning.learningproject.libs.whitelist.GodModeLoginsProvider.GOD_MODE_ROLENAME;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -27,8 +29,8 @@ public class SecurityConfigActuator {
                 .securityMatcher(antMatcher("/actuator/**"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
-                        .requestMatchers(antMatcher("/actuator/health/**")).hasAnyRole(DEVOPS_USER, DEVOPS_ADMIN, DEFAULT_WHITELIST_ROLENAME)
-                        .requestMatchers(antMatcher("/actuator/appinfo/**")).hasRole(DEVOPS_ADMIN)
+                        .requestMatchers(antMatcher("/actuator/health/**")).hasAnyRole(USER_ROLE_NAME, ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
+                        .requestMatchers(antMatcher("/actuator/appinfo/**")).hasAnyRole(ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

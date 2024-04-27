@@ -1,6 +1,5 @@
 package com.gitlab.emradbuba.learning.learningproject.config.security.memory;
 
-import com.gitlab.emradbuba.learning.learningproject.config.security.SecurityConfigActuator;
 import com.gitlab.emradbuba.learning.learningproject.config.security.SecurityConfigRestApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,27 +18,15 @@ public class InMemoryUsersConfig {
         UserDetails userDetails = User.builder()
                 .username("user")
                 .password(PASSWORD_BCRYPTED)
-                .roles(SecurityConfigRestApi.USER)
+                .roles(SecurityConfigRestApi.USER_ROLE_NAME)
                 .build();
 
         UserDetails adminDetails = User.builder()
                 .username("admin")
                 .password(PASSWORD_BCRYPTED)
-                .roles(SecurityConfigRestApi.ADMIN)
+                .roles(SecurityConfigRestApi.ADMIN_ROLE_NAME)
                 .build();
 
-        UserDetails devopsUserDetails = User.builder()
-                .username("devopsuser")
-                .password(PASSWORD_BCRYPTED)
-                .roles(SecurityConfigActuator.DEVOPS_USER)
-                .build();
-
-        UserDetails devopsAdminDetails = User.builder()
-                .username("devopsadmin")
-                .password(PASSWORD_BCRYPTED)
-                .roles(SecurityConfigActuator.DEVOPS_ADMIN)
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails, adminDetails, devopsAdminDetails, devopsUserDetails);
+        return new InMemoryUserDetailsManager(userDetails, adminDetails);
     }
 }

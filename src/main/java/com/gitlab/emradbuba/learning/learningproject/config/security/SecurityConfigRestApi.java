@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.gitlab.emradbuba.learning.learningproject.libs.whitelist.UsernamesWhitelistProvider.DEFAULT_WHITELIST_ROLENAME;
+import static com.gitlab.emradbuba.learning.learningproject.libs.whitelist.GodModeLoginsProvider.GOD_MODE_ROLENAME;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -20,8 +20,8 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @EnableWebSecurity
 public class SecurityConfigRestApi {
 
-    public static final String ADMIN = "ADMIN";
-    public static final String USER = "USER";
+    public static final String ADMIN_ROLE_NAME = "ADMIN";
+    public static final String USER_ROLE_NAME = "USER";
     public static final String API_URL_PATTERN = "/api/**";
 
     private final UserDetailsService inMemoryUsersDetailsService;
@@ -37,8 +37,8 @@ public class SecurityConfigRestApi {
                 .securityMatcher(API_URL_PATTERN)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(antMatcher(HttpMethod.DELETE, API_URL_PATTERN)).hasAnyRole(ADMIN, DEFAULT_WHITELIST_ROLENAME)
-                        .requestMatchers(antMatcher(API_URL_PATTERN)).hasAnyRole(ADMIN, USER)
+                        .requestMatchers(antMatcher(HttpMethod.DELETE, API_URL_PATTERN)).hasAnyRole(ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
+                        .requestMatchers(antMatcher(API_URL_PATTERN)).hasAnyRole(USER_ROLE_NAME, ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(inMemoryUsersDetailsService)
