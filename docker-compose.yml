@@ -1,0 +1,21 @@
+networks:
+  test-net:
+
+volumes:
+  test-vol:
+
+services:
+  rest:
+    build: .
+    image: emradbuba/learning-project-restapp:tag-1.0.0-SNAPSHOT
+    container_name: learning-project-restapp-container
+    command: java -jar restapp-1.0.0-SNAPSHOT.jar
+    ports:
+      - target: 8080 # <-- port of the restapp
+        published: 8080 # <-- published port for accessing from outside
+    networks:
+      - test-net
+    volumes:
+      - type: volume
+        source: test-vol
+        target: /app
