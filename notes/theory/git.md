@@ -7,7 +7,7 @@ Removing branches which no longer exist on remote repo.
 <details>
 <summary>In such case how many branches are we considering indeed? </summary>
 
-> Three. 
+> Three.
 > <details>
 > <summary>What area these three branches?</summary>
 > 
