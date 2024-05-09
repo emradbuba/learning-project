@@ -44,6 +44,6 @@ public class PersonEntity {
     @JsonManagedReference
     private IdCardEntity idCard;
 
-    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<EmploymentCertificateEntity> certificates;
 }
