@@ -1,14 +1,14 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LearningProjectExceptionReason;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
-import jakarta.validation.Validator;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,9 @@ public class PersonService {
     public Person getPerson(String personBusinessId) {
         PersonEntity personEntity = personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personBusinessId: " + personBusinessId));
+                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given businessId: " + personBusinessId)
+                        .withPersonId(personBusinessId)
+                        .withReason(LearningProjectExceptionReason.PERSON_ID_NOT_FOUND));
         return personEntityToPersonConverter.fromPersonEntity(personEntity);
     }
 
@@ -45,9 +47,11 @@ public class PersonService {
 
     @Transactional
     public Person updateExistingPerson(UpdateExistingPersonCommand updateExistingPersonCommand) {
-        String businessId = updateExistingPersonCommand.getBusinessId();
-        PersonEntity existingPersonEntity = personRepository.findByBusinessId(businessId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given businessId: " + businessId));
+        String personBusinessId = updateExistingPersonCommand.getBusinessId();
+        PersonEntity existingPersonEntity = personRepository.findByBusinessId(personBusinessId)
+                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given businessId: " + personBusinessId)
+                        .withPersonId(personBusinessId)
+                        .withReason(LearningProjectExceptionReason.PERSON_ID_NOT_FOUND));
         existingPersonEntity.setFirstName(updateExistingPersonCommand.getFirstName());
         existingPersonEntity.setSurname(updateExistingPersonCommand.getSurname());
         existingPersonEntity.setDateOfBirth(updateExistingPersonCommand.getDateOfBirth());
@@ -59,7 +63,10 @@ public class PersonService {
     @Transactional
     public void deletePerson(String businessId) {
         PersonEntity existingPersonEntity = personRepository.findByBusinessId(businessId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given businessId: " + businessId));
+                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given businessId: " + businessId)
+                        .withPersonId(businessId)
+                        .withReason(LearningProjectExceptionReason.PERSON_ID_NOT_FOUND)
+                );
         personRepository.deleteById(existingPersonEntity.getId());
     }
 

@@ -4,6 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostN
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPRestCallException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
@@ -37,7 +38,12 @@ public class PersonController {
     public ResponseEntity<Person> getPerson(@Parameter(description = "UUID - businessId of a person", required = true,
             example = "f131dd87-a582-48e1-af07-a083122daa3c")
                                             @PathVariable("personBusinessId") String personBusinessId) {
-        return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
+        } catch (Exception e) {
+            throw new LPRestCallException("Error while getting a person by id", e)
+                    .withPersonId(personBusinessId);
+        }
     }
 
     @PostMapping
@@ -48,9 +54,13 @@ public class PersonController {
                     schema = @Schema(implementation = Person.class, description = "Newly created person with generated " +
                             "businessId"))})
     public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
-        AddNewPersonCommand addNewPersonCommand = postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
-        Person newlyCreatedPerson = personService.storeNewPerson(addNewPersonCommand);
-        return new ResponseEntity<>(newlyCreatedPerson, HttpStatus.CREATED);
+        try {
+            AddNewPersonCommand addNewPersonCommand = postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
+            Person newlyCreatedPerson = personService.storeNewPerson(addNewPersonCommand);
+            return new ResponseEntity<>(newlyCreatedPerson, HttpStatus.CREATED);
+        } catch (Exception e) {
+            throw new LPRestCallException("Error while creating a new person", e);
+        }
     }
 
     @PutMapping("/{personBusinessId}")
@@ -64,9 +74,14 @@ public class PersonController {
                                                                required = true, example = "f131dd87-a582-48e1-af07" +
                                                                "-a083122daa3c")
                                                        @PathVariable("personBusinessId") String personBusinessId) {
-        UpdateExistingPersonCommand updateExistingPersonCommand =
-                putExistingPersonRequestToCommandConverter.toCommand(personBusinessId, putExistingPersonRequest);
-        return new ResponseEntity<>(personService.updateExistingPerson(updateExistingPersonCommand), HttpStatus.OK);
+        try {
+            UpdateExistingPersonCommand updateExistingPersonCommand =
+                    putExistingPersonRequestToCommandConverter.toCommand(personBusinessId, putExistingPersonRequest);
+            return new ResponseEntity<>(personService.updateExistingPerson(updateExistingPersonCommand), HttpStatus.OK);
+        } catch (Exception e) {
+            throw new LPRestCallException("Error while updating an existing person", e)
+                    .withPersonId(personBusinessId);
+        }
     }
 
     @DeleteMapping("/{personBusinessId}")
@@ -80,6 +95,11 @@ public class PersonController {
             @Parameter(description = "UUID - businessId of a person to delete", required = true, example = "f131dd87" +
                     "-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
-        personService.deletePerson(personBusinessId);
+        try {
+            personService.deletePerson(personBusinessId);
+        } catch (Exception e) {
+            throw new LPRestCallException("Error while deleting an existing person", e)
+                    .withPersonId(personBusinessId);
+        }
     }
 }

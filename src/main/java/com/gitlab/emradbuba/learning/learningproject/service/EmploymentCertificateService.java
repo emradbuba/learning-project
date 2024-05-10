@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.CertificateNotFoundException;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.CertRepo;
@@ -110,7 +110,7 @@ public class EmploymentCertificateService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given personId: " + personBusinessId));
+                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given personId: " + personBusinessId));
     }
 
     private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity,

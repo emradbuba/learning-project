@@ -1,19 +1,20 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.converters.IdCardEntityToIdCardConverter;
-import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardAlreadyExistsAppException;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.IdCardDoesNotExistAppException;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.PersonNotFoundAppException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LearningProjectExceptionReason;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.bad.LPBusinessRulesViolationException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.IdCardRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.IdCardEntity;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.IdCardEntityToIdCardConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +37,17 @@ public class IdCardService {
 
     @Transactional
     public Person addIdCardToPerson(AddNewIdCardCommand addNewIdCardCommand) {
-        String personBusinessId = addNewIdCardCommand.getPersonBusinessId();
-        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        String personBusinessIdFromCmd = addNewIdCardCommand.getPersonBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessIdFromCmd);
         IdCardEntity existingIdCardEntity = existingPersonEntity.getIdCard();
         if (existingIdCardEntity != null) {
-            throw new IdCardAlreadyExistsAppException("IdCard already exists for person with businessId: " + personBusinessId);
+            throw new LPBusinessRulesViolationException(
+                    String.format(
+                            "Person [%s] already has an idCard %s - cannot add a new one",
+                            existingPersonEntity.getBusinessId(),
+                            existingIdCardEntity.getBusinessId()))
+                    .withReason(LearningProjectExceptionReason.ID_CARD_ALREADY_DEFINED)
+                    .withPersonId(existingPersonEntity.getBusinessId());
         }
         String idCardBusinessId = BusinessIdUtils.generateBusinessId();
         IdCardEntity newIdCardEntity = new IdCardEntity();
@@ -58,11 +65,11 @@ public class IdCardService {
 
     @Transactional
     public Person updateIdCardInPerson(UpdateExistingIdCardCommand updateExistingIdCardCommand) {
-        String personBusinessId = updateExistingIdCardCommand.getPersonBusinessId();
-        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
+        String personBusinessIdFromCmd = updateExistingIdCardCommand.getPersonBusinessId();
+        PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessIdFromCmd);
         IdCardEntity existingIdCardEntity = Optional.ofNullable(existingPersonEntity.getIdCard())
                 .orElseThrow(() -> new IdCardDoesNotExistAppException("IdCard does not exist for person with businessId:" +
-                        " " + personBusinessId));
+                        " " + personBusinessIdFromCmd));
         existingIdCardEntity.setSerialNumber(updateExistingIdCardCommand.getSerialNumber());
         existingIdCardEntity.setValidUntil(updateExistingIdCardCommand.getValidUntil());
         existingIdCardEntity.setPublishedBy(updateExistingIdCardCommand.getPublishedBy());
@@ -84,12 +91,14 @@ public class IdCardService {
             PersonEntity personEntityAfterChages = personRepository.save(existingPersonEntity);
             return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChages);
         }
-        throw new PersonNotFoundAppException("No person found for given businessId: " + personBusinessId);
+        return personEntityToPersonConverter.fromPersonEntity(existingPersonEntity);
     }
 
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> new PersonNotFoundAppException("No person found for given businessId: " + personBusinessId));
+                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given businessId: " + personBusinessId)
+                        .withPersonId(personBusinessId)
+                        .withExtraInformation("Probably personId was mistyped"));
     }
 }
