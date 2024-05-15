@@ -1,7 +1,8 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.CertificateNotFoundException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPEmploymentCertNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
@@ -15,6 +16,7 @@ import com.gitlab.emradbuba.learning.learningproject.service.converters.Certific
 import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+// TODO: Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
 
 @Service
 @AllArgsConstructor
@@ -110,7 +114,12 @@ public class EmploymentCertificateService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> new LPPersonNotFoundException("No person found for given personId: " + personBusinessId));
+                .orElseThrow(() ->
+                        new LPPersonNotFoundException("No person found for given personId: " + personBusinessId)
+                                .withPersonBusinessId(personBusinessId)
+                                .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
+                                .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
+                );
     }
 
     private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity,
@@ -120,7 +129,7 @@ public class EmploymentCertificateService {
                 .filter(cert -> cert.getBusinessId().equals(certificateBusinessId))
                 .findFirst()
                 .orElseThrow(() ->
-                        new CertificateNotFoundException(
+                        new LPEmploymentCertNotFoundException(
                                 String.format("Person with businessId=%s has no certificate with businessId=%s",
                                         existingPersonEntity.getBusinessId(),
                                         certificateBusinessId)

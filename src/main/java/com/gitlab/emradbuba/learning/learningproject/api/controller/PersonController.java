@@ -4,7 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostN
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPRestCallException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @Tag(name = "Person management", description = "This part of API enables to manage persons")
 public class PersonController {
+
     private final PersonService personService;
     private final PostNewPersonRequestToCommandConverter postNewPersonRequestToCommandConverter;
     private final PutExistingPersonRequestToCommandConverter putExistingPersonRequestToCommandConverter;
@@ -41,8 +42,8 @@ public class PersonController {
         try {
             return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
         } catch (Exception e) {
-            throw new LPRestCallException("Error while getting a person by id", e)
-                    .withPersonId(personBusinessId);
+            throw new LPException("Error while getting a person by id", e)
+                    .withPersonBusinessId(personBusinessId);
         }
     }
 
@@ -55,11 +56,12 @@ public class PersonController {
                             "businessId"))})
     public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
         try {
-            AddNewPersonCommand addNewPersonCommand = postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
+            AddNewPersonCommand addNewPersonCommand =
+                    postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
             Person newlyCreatedPerson = personService.storeNewPerson(addNewPersonCommand);
             return new ResponseEntity<>(newlyCreatedPerson, HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new LPRestCallException("Error while creating a new person", e);
+            throw new LPException("Error while creating a new person", e);
         }
     }
 
@@ -79,8 +81,8 @@ public class PersonController {
                     putExistingPersonRequestToCommandConverter.toCommand(personBusinessId, putExistingPersonRequest);
             return new ResponseEntity<>(personService.updateExistingPerson(updateExistingPersonCommand), HttpStatus.OK);
         } catch (Exception e) {
-            throw new LPRestCallException("Error while updating an existing person", e)
-                    .withPersonId(personBusinessId);
+            throw new LPException("Error while updating an existing person", e)
+                    .withPersonBusinessId(personBusinessId);
         }
     }
 
@@ -98,8 +100,8 @@ public class PersonController {
         try {
             personService.deletePerson(personBusinessId);
         } catch (Exception e) {
-            throw new LPRestCallException("Error while deleting an existing person", e)
-                    .withPersonId(personBusinessId);
+            throw new LPException("Error while deleting an existing person", e)
+                    .withPersonBusinessId(personBusinessId);
         }
     }
 }
