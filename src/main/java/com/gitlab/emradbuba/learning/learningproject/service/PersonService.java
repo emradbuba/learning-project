@@ -30,7 +30,7 @@ public class PersonService {
                         .withPersonBusinessId(personBusinessId)
                         .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
                         .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
-                        .withSolutionTip("Make sure a person exists in this database"));
+                        .withSolutionTip("Create a person first"));
         return personEntityToPersonConverter.fromPersonEntity(personEntity);
     }
 
@@ -56,7 +56,8 @@ public class PersonService {
                 .orElseThrow(() -> new LPPersonNotFoundException(PERSON_ID_NOT_FOUND_MSG + personBusinessId)
                         .withPersonBusinessId(personBusinessId)
                         .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
-                        .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value()));
+                        .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
+                        .withSolutionTip("Make sure the person you want to update wasn't removed before"));
         existingPersonEntity.setFirstName(updateExistingPersonCommand.getFirstName());
         existingPersonEntity.setSurname(updateExistingPersonCommand.getSurname());
         existingPersonEntity.setDateOfBirth(updateExistingPersonCommand.getDateOfBirth());
@@ -71,6 +72,7 @@ public class PersonService {
                 .orElseThrow(() -> new LPPersonNotFoundException(PERSON_ID_NOT_FOUND_MSG + businessId)
                         .withPersonBusinessId(businessId)
                         .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
+                        .withSolutionTip("Maybe person was already removed by other system")
                         .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
                 );
         personRepository.deleteById(existingPersonEntity.getId());

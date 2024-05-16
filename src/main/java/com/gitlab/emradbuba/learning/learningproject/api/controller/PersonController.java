@@ -4,6 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostN
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
+import com.gitlab.emradbuba.learning.learningproject.handler.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
@@ -33,13 +34,26 @@ public class PersonController {
 
     @GetMapping("/{personBusinessId}")
     @Operation(summary = "Finds a person by person's businessId", description = "Returns a person by businessId")
-    @ApiResponse(responseCode = "200", description = "When person exists in the system",
+    @ApiResponse(responseCode = "200",
+            description = "When person exists in the system",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Person.class, description = "The found person")))
-    public ResponseEntity<Person> getPerson(@Parameter(description = "UUID - businessId of a person", required = true,
-            example = "f131dd87-a582-48e1-af07-a083122daa3c")
-                                            @PathVariable("personBusinessId") String personBusinessId) {
+                    schema = @Schema(
+                            implementation = Person.class,
+                            description = "The found person"))
+    )
+    @ApiResponse(responseCode = "404",
+            description = "When person does not exist in the system",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = LPErrorResponse.class,
+                            description = "Standard error response from learning project"))
+    )
+    public ResponseEntity<Person> getPerson(
+            @Parameter(description = "UUID - businessId of a person", required = true,
+                    example = "f131dd87-a582-48e1-af07-a083122daa3c")
+            @PathVariable("personBusinessId") String personBusinessId) {
         try {
+
             return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
         } catch (Exception e) {
             throw new LPException("Error while getting a person by id", e)
@@ -53,7 +67,8 @@ public class PersonController {
     @ApiResponse(responseCode = "201", description = "When person successfully created",
             content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Person.class, description = "Newly created person with generated " +
-                            "businessId"))})
+                            "businessId"))}
+    )
     public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
         try {
             AddNewPersonCommand addNewPersonCommand =
