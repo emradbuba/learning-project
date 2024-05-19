@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.handler;
+package com.gitlab.emradbuba.learning.learningproject.exceptions;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 public class LPErrorResponse {
     private final String message;
     private final String httpStatusInfo;
-    private final String errorCode;
-    private final String solutionTips;
+    private final String lpErrorCode;
+    private final String lpErrorDescription;
+    private final String lpSolutionTips;
     private final String personBusinessId;
     private final String rootCauseClass;
     private final String rootCauseMessage;

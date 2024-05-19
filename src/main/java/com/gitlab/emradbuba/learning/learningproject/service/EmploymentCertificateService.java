@@ -1,7 +1,8 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionUtils;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPEmploymentCertNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
@@ -26,6 +27,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionUtils.createLPPersonNotFoundException;
+
 // TODO: Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
 
 @Service
@@ -45,7 +48,7 @@ public class EmploymentCertificateService {
 
         return certificateEntities.stream()
                 .map(certificateEntityToCertificateConverter::fromCertificateEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -61,7 +64,7 @@ public class EmploymentCertificateService {
         newCertificateEntity.setEndDate(addNewCertificateCommand.getEndDate());
 
         // As it is a new entity, it has to be persisted ("new" -> "managed" entity transition)
-        // (In this case it's not required due to cascading (PERSIST/MERGE), but will not hurt)
+        // (In this case it's not required due to cascading (PERSIST/MERGE), but it will not hurt)
         certRepo.save(newCertificateEntity);
         existingPersonEntity.getCertificates().add(newCertificateEntity);
 
@@ -74,15 +77,13 @@ public class EmploymentCertificateService {
         final String personBusinessId = updateExistingCertificateCommand.getPersonBusinessId();
         final String certificateBusinessId = updateExistingCertificateCommand.getCertificateBusinessId();
         PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessId);
-        EmploymentCertificateEntity existingCertificateEntity = getPersonCertificate(existingPersonEntity,
-                certificateBusinessId);
+        EmploymentCertificateEntity existingCertificateEntity = getPersonCertificate(existingPersonEntity, certificateBusinessId);
 
         existingCertificateEntity.setStartDate(updateExistingCertificateCommand.getStartDate());
         existingCertificateEntity.setEndDate(updateExistingCertificateCommand.getEndDate());
         existingCertificateEntity.setCompanyName(updateExistingCertificateCommand.getCompanyName());
 
-        // Saving certificate/person not required as it's already managed and commit() will do the work... but we want
-        // return person...
+        // Saving certificate/person not required as it's already managed and commit() will do the work... but we want return person...
         PersonEntity personEntityAfterChanges = personRepository.save(existingPersonEntity);
         return personEntityToPersonConverter.fromPersonEntity(personEntityAfterChanges);
     }
@@ -114,26 +115,22 @@ public class EmploymentCertificateService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() ->
-                        new LPPersonNotFoundException("No person found for given personId: " + personBusinessId)
-                                .withPersonBusinessId(personBusinessId)
-                                .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
-                                .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
-                );
+                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId));
     }
 
-    private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity,
-                                                             String certificateBusinessId) {
+    private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity, String certId) {
         return existingPersonEntity.getCertificates()
                 .stream()
-                .filter(cert -> cert.getBusinessId().equals(certificateBusinessId))
+                .filter(cert -> cert.getBusinessId().equals(certId))
                 .findFirst()
                 .orElseThrow(() ->
                         new LPEmploymentCertNotFoundException(
-                                String.format("Person with businessId=%s has no certificate with businessId=%s",
-                                        existingPersonEntity.getBusinessId(),
-                                        certificateBusinessId)
-                        )
+                                String.format("Person with businessId=%s has no certificate with businessId=%s", existingPersonEntity.getBusinessId(), certId))
+                                .withPersonBusinessId(existingPersonEntity.getBusinessId())
+                                .withHttpStatusCodeValue(409)
+                                .withUniqueErrorCode(LPServiceExceptionErrorCode.CERT_ID_NOT_FOUND.getReasonCode())
+                                .withDescription(LPServiceExceptionErrorCode.CERT_ID_NOT_FOUND.getDescription())
+                                .withSolutionTip("Are you sure you meant the right person?")
                 );
     }
 }

@@ -8,8 +8,7 @@ import static com.gitlab.emradbuba.learning.learningproject.api.converters.Mappi
 
 @Component
 public class PutExistingPersonRequestToCommandConverter {
-    public UpdateExistingPersonCommand toCommand(String personBusinessId,
-                                                 PutExistingPersonRequest putExistingPersonRequest) {
+    public UpdateExistingPersonCommand toCommand(String personBusinessId, PutExistingPersonRequest putExistingPersonRequest) {
         return UpdateExistingPersonCommand.builder()
                 .businessId(normalizeString(personBusinessId))
                 .firstName(normalizeString(putExistingPersonRequest.getFirstName()))

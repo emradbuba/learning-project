@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.handler.analysis;
+package com.gitlab.emradbuba.learning.learningproject.exceptions.analysis;
 
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import org.apache.commons.lang3.StringUtils;
@@ -27,12 +27,13 @@ public class RestControllerExceptionAnalyzer {
         initFirstLearningProjectException();
 
         return RestControllerExceptionAnalyzerResult.builder()
-                .finalHttpStatus(determineFinalHttpStatus())
+                .lpExwceptionFinalHttpStatus(determineFinalHttpStatus())
                 .mainErrorMessage(determineMainErrorMessage())
                 .rootErrorMessage(determineRootThrowableErrorMessage())
                 .lpExceptionErrorCode(determineLPExceptionErrorCode())
+                .lpExceptionDescription(determineLPExceptionDescription())
                 .rootThrowableClass(throwableChainStartingFromRoot.getFirst().getClass().getSimpleName())
-                .solutionTips(determineSolutionTips())
+                .lpExceptionSolutionTips(determineSolutionTips())
                 .personBusinessId(determinePersonBusinessId())
                 .build();
     }
@@ -74,7 +75,14 @@ public class RestControllerExceptionAnalyzer {
 
     private String determineLPExceptionErrorCode() {
         return Optional.ofNullable(firstLearningProjectException)
-                .map(LPException::getMessage)
+                .map(LPException::getUniqueErrorCode)
+                .filter(StringUtils::isNoneBlank)
+                .orElse(null);
+    }
+
+    private String determineLPExceptionDescription() {
+        return Optional.ofNullable(firstLearningProjectException)
+                .map(LPException::getDescription)
                 .filter(StringUtils::isNoneBlank)
                 .orElse(null);
     }

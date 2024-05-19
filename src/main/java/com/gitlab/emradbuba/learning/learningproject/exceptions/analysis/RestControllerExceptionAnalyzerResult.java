@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.handler.analysis;
+package com.gitlab.emradbuba.learning.learningproject.exceptions.analysis;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RestControllerExceptionAnalyzerResult {
-    private HttpStatus finalHttpStatus;
+    private HttpStatus lpExwceptionFinalHttpStatus;
     private String rootThrowableClass;
     private String mainErrorMessage;
     private String rootErrorMessage;
     private String lpExceptionErrorCode;
-    private List<String> solutionTips;
+    private String lpExceptionDescription;
+    private List<String> lpExceptionSolutionTips;
     private String personBusinessId;
 }
