@@ -4,11 +4,14 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PostI
 import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PutIdCardRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PostIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PutIdCardRequest;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.IdCardService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.validation.IdCardCommandValidator;
+import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,11 +34,11 @@ public class IdCardController {
     private final PutIdCardRequestToCommandConverter putIdCardRequestToCommandConverter;
 
     @GetMapping("/person/{personBusinessId}")
-    @Operation(summary = "Gets person's idCard",
-            description = "Gets an IdCard of a person with given businessId")
-    @ApiResponse(responseCode = "200", description = "When card id for a person was found",
-            content = @Content(
-                    schema = @Schema(implementation = IdCard.class)))
+    @Operation(summary = "Gets person's idCard", description = "Gets an IdCard of a person with given businessId")
+    @ApiResponse(responseCode = "200", description = "When card id for a person was found", content = @Content(schema = @Schema(implementation = IdCard.class)))
+    @ApiResponse(responseCode = "204", description = "When person has no IdCard assigned")
+    @ApiResponse(responseCode = "404", description = "When a person with given personBusinessId was not found", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
+    @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input data", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
     public ResponseEntity<IdCard> getPersonIdCard(
             @Parameter(description = "UUID - businessId of a person", example = "72ae530b-c70a-4041-81db-a7f6a4df1ecc")
             @PathVariable("personBusinessId") String personBusinessId) {
@@ -46,34 +49,31 @@ public class IdCardController {
     }
 
     @PostMapping("/person/{personBusinessId}")
-    @Operation(summary = "Adds a new IdCard",
-            description = "Adds IdCard to a person with given businessId. Card's businessId is generated. Person is " +
-                    "allowed to have only one IdCard")
-    @ApiResponse(responseCode = "201", description = "When card id for a person was added",
-            content = @Content(
-                    schema = @Schema(implementation = Person.class, description = "Person with added IdCard")))
+    @Operation(summary = "Adds a new IdCard", description = "Adds IdCard to a person with given businessId. Card's businessId is generated. Person is allowed to have only one IdCard")
+    @ApiResponse(responseCode = "201", description = "When card id for a person was added", content = @Content(schema = @Schema(implementation = Person.class, description = "Person with added IdCard")))
+    @ApiResponse(responseCode = "404", description = "When a person with given personBusinessId was not found", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
+    @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input data", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
     public ResponseEntity<Person> addPersonIdCard(
-            @Parameter(description = "UUID - businessId of a person", example = "72ae530b-c70a-4041-81db-a7f6a4df1ecc")
-            @PathVariable("personBusinessId") String personBusinessId,
+            @Parameter(description = "UUID - businessId of a person", example = "72ae530b-c70a-4041-81db-a7f6a4df1ecc") @PathVariable("personBusinessId") String personBusinessId,
             @RequestBody PostIdCardRequest postIdCardRequest) {
-        final AddNewIdCardCommand addNewIdCardCommand = postIdCardRequestToCommandConverter
-                .toCommand(personBusinessId, postIdCardRequest);
+        ValidationUtils.validateUUID(personBusinessId);
+        final AddNewIdCardCommand addNewIdCardCommand = postIdCardRequestToCommandConverter.toCommand(personBusinessId, postIdCardRequest);
+        IdCardCommandValidator.validateAddNewIdCardCommand(addNewIdCardCommand);
         final Person personAfterChanges = idCardService.addIdCardToPerson(addNewIdCardCommand);
         return new ResponseEntity<>(personAfterChanges, HttpStatus.CREATED);
     }
 
     @PutMapping("/person/{personBusinessId}")
-    @Operation(summary = "Updates an IdCard",
-            description = "Updates information about IdCard of a person with specified businessId")
-    @ApiResponse(responseCode = "200", description = "When card id for a person was updated",
-            content = @Content(
-                    schema = @Schema(implementation = Person.class, description = "Person with updated IdCard")))
+    @Operation(summary = "Updates an IdCard", description = "Updates information about IdCard of a person with specified businessId")
+    @ApiResponse(responseCode = "200", description = "When card id for a person was updated", content = @Content(schema = @Schema(implementation = Person.class, description = "Person with updated IdCard")))
+    @ApiResponse(responseCode = "404", description = "When a person with given Id was not found", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
+    @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input data", content = @Content(schema = @Schema(implementation = LPErrorResponse.class)))
     public ResponseEntity<Person> updatePersonIdCard(
-            @Parameter(description = "UUID - businessId of a person", example = "72ae530b-c70a-4041-81db-a7f6a4df1ecc")
-            @PathVariable("personBusinessId") String personBusinessId,
+            @Parameter(description = "UUID - businessId of a person", example = "72ae530b-c70a-4041-81db-a7f6a4df1ecc") @PathVariable("personBusinessId") String personBusinessId,
             @RequestBody PutIdCardRequest putIdCardRequest) {
-        final UpdateExistingIdCardCommand updateExistingIdCardCommand =
-                putIdCardRequestToCommandConverter.toCommand(personBusinessId, putIdCardRequest);
+        ValidationUtils.validateUUID(personBusinessId);
+        final UpdateExistingIdCardCommand updateExistingIdCardCommand = putIdCardRequestToCommandConverter.toCommand(personBusinessId, putIdCardRequest);
+        IdCardCommandValidator.validateAddNewIdCardCommand(putIdCardRequest);
         Person personAfterChanges = idCardService.updateIdCardInPerson(updateExistingIdCardCommand);
         return ResponseEntity.ok(personAfterChanges);
     }

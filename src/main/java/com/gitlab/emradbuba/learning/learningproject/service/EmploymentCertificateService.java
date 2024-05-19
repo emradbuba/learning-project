@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionUtils;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPEmploymentCertNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionUtils.createLPPersonNotFoundException;
 
 // TODO: Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
 
@@ -114,16 +116,10 @@ public class EmploymentCertificateService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() ->
-                        new LPPersonNotFoundException("No person found for given personId: " + personBusinessId)
-                                .withPersonBusinessId(personBusinessId)
-                                .withHttpStatusCodeValue(HttpStatus.NOT_FOUND.value())
-                                .withLPExceptionErrorCode(LPExceptionErrorCode.PERSON_ID_NOT_FOUND)
-                );
+                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId));
     }
 
-    private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity,
-                                                             String certificateBusinessId) {
+    private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity, String certificateBusinessId) {
         return existingPersonEntity.getCertificates()
                 .stream()
                 .filter(cert -> cert.getBusinessId().equals(certificateBusinessId))

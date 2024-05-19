@@ -1,7 +1,7 @@
-package com.gitlab.emradbuba.learning.learningproject.handler;
+package com.gitlab.emradbuba.learning.learningproject.exceptions;
 
-import com.gitlab.emradbuba.learning.learningproject.handler.analysis.RestControllerExceptionAnalyzerResult;
-import com.gitlab.emradbuba.learning.learningproject.handler.analysis.RestControllerExceptionAnalyzer;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.analysis.RestControllerExceptionAnalyzerResult;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.analysis.RestControllerExceptionAnalyzer;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @ControllerAdvice
 @AllArgsConstructor
@@ -23,7 +22,7 @@ public class RestControllerExceptionHandler {
         final RestControllerExceptionAnalyzer exceptionAnalyzer = new RestControllerExceptionAnalyzer(exception);
         final RestControllerExceptionAnalyzerResult analyzerResult = exceptionAnalyzer.analyzeThrowable();
 
-        final HttpStatus httpStatus = analyzerResult.getFinalHttpStatus();
+        final HttpStatus httpStatus = analyzerResult.getLpExwceptionFinalHttpStatus();
 
         return new ResponseEntity<>(
                 LPErrorResponse.builder()
@@ -31,8 +30,9 @@ public class RestControllerExceptionHandler {
                         .httpStatusInfo(String.format("[%d] %s", httpStatus.value(), httpStatus.getReasonPhrase()))
                         .rootCauseClass(analyzerResult.getRootThrowableClass())
                         .rootCauseMessage(analyzerResult.getRootErrorMessage())
-                        .errorCode(analyzerResult.getLpExceptionErrorCode())
-                        .solutionTips(String.join(ERROR_SOLUTION_TIP_DELIMITER, analyzerResult.getSolutionTips()))
+                        .lpErrorCode(analyzerResult.getLpExceptionErrorCode())
+                        .lpErrorDescription(analyzerResult.getLpExceptionDescription())
+                        .lpSolutionTips(String.join(ERROR_SOLUTION_TIP_DELIMITER, analyzerResult.getLpExceptionSolutionTips()))
                         .personBusinessId(analyzerResult.getPersonBusinessId())
                         .restCallErrorResponseTime(LocalDateTime.now())
                         .build(),
