@@ -28,7 +28,7 @@ public class PersonCommandValidator {
     }
 
     private static void validateFirstName(final String firstName) {
-        if (StringUtils.isNoneBlank(firstName)) {
+        if (StringUtils.isBlank(firstName)) {
             throw new LPIncorrectInputException("Incorrect person input data")
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_PERSON_FIRST_NAME_IS_EMPTY.getReasonCode())
@@ -38,7 +38,7 @@ public class PersonCommandValidator {
     }
 
     private static void validateSurname(String surname) {
-        if (StringUtils.isNoneBlank(surname)) {
+        if (StringUtils.isBlank(surname)) {
             throw new LPIncorrectInputException("Incorrect person input data")
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_PERSON_SURNAME_IS_EMPTY.getReasonCode())

@@ -57,7 +57,7 @@ public class IdCardCommandValidator {
                     .withDescription(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_EMPTY.getDescription())
                     .withSolutionTip("Enter the validity in the request");
         }
-        if (!validUntil.isBefore(LocalDate.now())) {
+        if (validUntil.isBefore(LocalDate.now())) {
             throw new LPIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_INVALID.name())
