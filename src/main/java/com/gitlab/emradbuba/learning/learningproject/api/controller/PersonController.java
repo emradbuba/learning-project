@@ -4,6 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostN
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
+import com.gitlab.emradbuba.learning.learningproject.api.model.response.LPRestResponse;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
@@ -19,10 +20,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/person")
@@ -39,11 +49,33 @@ public class PersonController {
     @ApiResponse(responseCode = "200", description = "When person exists in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Person.class, description = "The found person")))
     @ApiResponse(responseCode = "404", description = "When person does not exist in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
-    public ResponseEntity<Person> getPerson(
+    public ResponseEntity<LPRestResponse<Person>> getPerson(
             @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
-            return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = requestAttributes.getRequest();
+            String s = request.getMethod();
+            HttpStatus resultHttpStatus = HttpStatus.OK;
+            LocalDateTime startTime = LocalDateTime.now();
+            LPRestResponse.LPRestResponseBuilder<Person> responseBuilder = LPRestResponse.builder();
+/*
+ org.springframework.web.servlet.HandlerMapping.bestMatchingPattern -> /api/v1/person/{personBusinessId}
+ org.springframework.web.util.ServletRequestPathUtils.PATH -> {DefaultRequestPath@17250} "/api/v1/person/eca03df0-e272-46a4-bb9a-eab3dd03f908"
+ org.springframework.web.servlet.HandlerMapping.uriTemplateVariables -> {Collections$UnmodifiableMap@17276}  size = 1
+   personBusinessId -> eca03df0-e272-46a4-bb9a-eab3dd03f908
+ org.springframework.security.web.context.RequestAttributeSecurityContextRepository.SPRING_SECURITY_CONTEXT -> {SecurityContextImpl@17246} "SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=god, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=null], Granted Authorities=[ROLE_GOD_MODE]]]"
+ */
+
+            Person person = personService.getPerson(personBusinessId);
+
+            responseBuilder.requestProcessingStartTime(startTime);
+            responseBuilder.requestProcessingDuration(Duration.between(startTime, LocalDateTime.now()).toMillis());
+            responseBuilder.calledEndpointMethod("GET");
+            responseBuilder.calledEndpointPath("/api/v1/person/{personBusinessId}");
+            responseBuilder.httpStatusCodeInfo("[" + resultHttpStatus.value() + "] " + resultHttpStatus.getReasonPhrase());
+            responseBuilder.payload(person);
+            return new ResponseEntity<>(responseBuilder.build(), resultHttpStatus);
         } catch (Exception e) {
             throw new LPException("Error while getting a person by id", e)
                     .withPersonBusinessId(personBusinessId);
