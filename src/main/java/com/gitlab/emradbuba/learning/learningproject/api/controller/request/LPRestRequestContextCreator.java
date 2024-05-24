@@ -1,36 +1,50 @@
-package com.gitlab.emradbuba.learning.learningproject.api.controller.details;
+package com.gitlab.emradbuba.learning.learningproject.api.controller.request;
 
-import com.gitlab.emradbuba.learning.learningproject.api.model.request.LPRestRequestDetails;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.request.additionals.LPAdditionalRequestInfoFinder;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.NoArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
-public class LPRestRequestDetailsCreator {
+@NoArgsConstructor
+public class LPRestRequestContextCreator {
     private static final String INFO_UNAVAILABLE = "<unavailable>";
 
-    public LPRestRequestDetails createRequestDetails() {
+    private LocalDateTime requestTime = LocalDateTime.now();
+    private LPAdditionalRequestInfoFinder additionalRequestInfoFinder; // DEFAULT
+
+    public LPRestRequestContextCreator withRequestTime(LocalDateTime requestTime) {
+        this.requestTime = requestTime;
+        return this;
+    }
+
+    public LPRestRequestContextCreator withAdditionalRequestInfoFinder(LPAdditionalRequestInfoFinder additionalRequestInfoFinder) {
+        this.additionalRequestInfoFinder = additionalRequestInfoFinder;
+        return this;
+    }
+
+
+    public LPRestRequestContext create() {
         return Optional.of(RequestContextHolder.currentRequestAttributes())
                 .filter(ServletRequestAttributes.class::isInstance)
                 .map(ServletRequestAttributes.class::cast)
-                .map(LPRestRequestDetailsCreator::fromServletRequestAttributes)
-                .orElse(LPRestRequestDetails.NULL_OBJECT);
+                .map(this::fromServletRequestAttributes)
+                .orElse(LPRestRequestContext.NULL_OBJECT);
     }
 
-    private static LPRestRequestDetails fromServletRequestAttributes(final ServletRequestAttributes requestAttributes) {
-        return LPRestRequestDetails.builder()
-                .requestStartTime(LocalDateTime.now())
+    private LPRestRequestContext fromServletRequestAttributes(final ServletRequestAttributes requestAttributes) {
+        return LPRestRequestContext.builder()
+                .requestStartTime(this.requestTime)
                 .endpointType(retrieveEndpointType(requestAttributes))
                 .endpointPath(retrieveEndpointPath(requestAttributes))
                 .username(retrieveUsername(requestAttributes))
@@ -38,7 +52,6 @@ public class LPRestRequestDetailsCreator {
                 .additionalDetails(retrieveAdditionalDetails(requestAttributes))
                 .build();
     }
-
 
     private static String retrieveEndpointType(final ServletRequestAttributes requestAttributes) {
         return Optional.of(requestAttributes.getRequest())
@@ -62,7 +75,7 @@ public class LPRestRequestDetailsCreator {
     private static String retrievedRole(final ServletRequestAttributes requestAttributes) {
         return Optional.of(requestAttributes.getRequest())
                 .map(HttpServletRequest::getUserPrincipal)
-                .map(LPRestRequestDetailsCreator::retrieveRoleFromPrinciple)
+                .map(LPRestRequestContextCreator::retrieveRoleFromPrinciple)
                 .orElse(INFO_UNAVAILABLE);
     }
 
@@ -77,10 +90,9 @@ public class LPRestRequestDetailsCreator {
                 .collect(Collectors.joining(", "));
     }
 
-    private static Map<String, String> retrieveAdditionalDetails(final ServletRequestAttributes requestAttributes) {
-        return new HashMap<String, String>() {{
-            put("test-param1", "<not supported yet>");
-            put("test-param2", "<not supported yet>");
-        }};
+    private Map<String, String> retrieveAdditionalDetails(ServletRequestAttributes requestAttributes) {
+        return Optional.ofNullable(additionalRequestInfoFinder)
+                .map(attributesFinder -> attributesFinder.find(requestAttributes))
+                .orElse(Collections.emptyMap());
     }
 }
