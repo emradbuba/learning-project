@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface LPAdditionalRequestInfoFinder {
     Map<String, String> find(ServletRequestAttributes requestAttributes);
+
+    DefaultLPAdditionalRequestInfoFinder DEFAULT = new DefaultLPAdditionalRequestInfoFinder();
 }

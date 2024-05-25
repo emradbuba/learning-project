@@ -21,7 +21,7 @@ public class LPRestRequestContextCreator {
     private static final String INFO_UNAVAILABLE = "<unavailable>";
 
     private LocalDateTime requestTime = LocalDateTime.now();
-    private LPAdditionalRequestInfoFinder additionalRequestInfoFinder; // DEFAULT
+    private LPAdditionalRequestInfoFinder additionalRequestInfoFinder = LPAdditionalRequestInfoFinder.DEFAULT;
 
     public LPRestRequestContextCreator withRequestTime(LocalDateTime requestTime) {
         this.requestTime = requestTime;
