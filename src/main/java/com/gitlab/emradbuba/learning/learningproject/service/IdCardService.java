@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionUtils.createLPPersonNotFoundException;
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceErrorUtils.createLPPersonNotFoundException;
 
 @Service
 @AllArgsConstructor
