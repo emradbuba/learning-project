@@ -2,6 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.exceptions;
 
 import com.gitlab.emradbuba.learning.learningproject.exceptions.analysis.RestControllerExceptionAnalyzerResult;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.analysis.RestControllerExceptionAnalyzer;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.utils.ExceptionLibVersion;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

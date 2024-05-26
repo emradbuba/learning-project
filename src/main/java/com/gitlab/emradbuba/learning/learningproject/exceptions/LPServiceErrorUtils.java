@@ -1,13 +1,12 @@
 package com.gitlab.emradbuba.learning.learningproject.exceptions;
 
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPPersonNotFoundException;
 import org.springframework.http.HttpStatus;
 
-public class LPServiceExceptionUtils {
+public class LPServiceErrorUtils {
     private static final String PERSON_ID_NOT_FOUND_MSG = "No person found for a given businessId: ";
 
-    private LPServiceExceptionUtils() {
+    private LPServiceErrorUtils() {
         // no instance
     }
 

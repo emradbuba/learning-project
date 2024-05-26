@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.exceptions;
 
+import com.gitlab.emradbuba.learning.learningproject.exceptions.versioninfo.LPErrorResponseVersionsInfo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,4 +22,5 @@ public class LPErrorResponse {
     private final String rootCauseMessage;
     private final LocalDateTime restCallStartTime;
     private final LocalDateTime restCallErrorResponseTime;
+    private final LPErrorResponseVersionsInfo libraries = new LPErrorResponseVersionsInfo();
 }

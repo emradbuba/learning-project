@@ -1,9 +1,13 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
+import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRestRequestContextCreator;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponseDetailsCreator;
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PostNewPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.converters.person.PutExistingPersonRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRestRequestContext;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponse;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
@@ -31,19 +35,26 @@ import org.springframework.web.bind.annotation.*;
 public class PersonController {
 
     private final PersonService personService;
+    private final LPRestResponseDetailsCreator restResponseDetailedInfoCreator;
     private final PostNewPersonRequestToCommandConverter postNewPersonRequestToCommandConverter;
     private final PutExistingPersonRequestToCommandConverter putExistingPersonRequestToCommandConverter;
 
     @GetMapping("/{personBusinessId}")
     @Operation(summary = "Finds a person by person's businessId", description = "Returns a person by businessId")
-    @ApiResponse(responseCode = "200", description = "When person exists in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Person.class, description = "The found person")))
+    @ApiResponse(responseCode = "200", description = "When person exists in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonResponse.class, description = "The found person")))
     @ApiResponse(responseCode = "404", description = "When person does not exist in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
-    public ResponseEntity<Person> getPerson(
+    public ResponseEntity<LPRestResponse<Person>> getPerson(
             @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
-            return new ResponseEntity<>(personService.getPerson(personBusinessId), HttpStatus.OK);
+            LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
+            Person person = personService.getPerson(personBusinessId);
+            LPRestResponse<Person> response = LPRestResponse.<Person>builder()
+                    .payload(person)
+                    .detailedInfo(restResponseDetailedInfoCreator.create(restRequestContext, HttpStatus.OK))
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             throw new LPException("Error while getting a person by id", e)
                     .withPersonBusinessId(personBusinessId);
@@ -52,34 +63,45 @@ public class PersonController {
 
     @PostMapping
     @Operation(summary = "Creates a new person", description = "Creates a new person with information from payload")
-    @ApiResponse(responseCode = "201", description = "When person successfully created", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Person.class, description = "Newly created person with generated businessId"))})
+    @ApiResponse(responseCode = "201", description = "When person successfully created", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PersonResponse.class, description = "Newly created person with generated businessId"))})
     @ApiResponse(responseCode = "404", description = "When person does not exist in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
-    public ResponseEntity<Person> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
+    public ResponseEntity<LPRestResponse<Person>> createNewPerson(@RequestBody PostNewPersonRequest postNewPersonRequest) {
         try {
+            LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             AddNewPersonCommand addNewPersonCommand = postNewPersonRequestToCommandConverter.toCommand(postNewPersonRequest);
             PersonCommandValidator.validateAddNewPersonCommand(addNewPersonCommand);
             Person newlyCreatedPerson = personService.storeNewPerson(addNewPersonCommand);
-            return new ResponseEntity<>(newlyCreatedPerson, HttpStatus.CREATED);
+            LPRestResponse<Person> response = LPRestResponse.<Person>builder()
+                    .payload(newlyCreatedPerson)
+                    .detailedInfo(restResponseDetailedInfoCreator.create(restRequestContext, HttpStatus.CREATED))
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             throw new LPException("Error while creating a new person", e);
         }
     }
 
     @PutMapping("/{personBusinessId}")
-    @ApiResponse(responseCode = "200", description = "When person successfully updated", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Person.class, description = "Person with updated data"))})
+    @ApiResponse(responseCode = "200", description = "When person successfully updated", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PersonResponse.class, description = "Person with updated data"))})
     @ApiResponse(responseCode = "404", description = "When person does not exist in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @Operation(summary = "Updates an existing person", description = "Updates an existing person with a given businessId with data sent in payload")
-    public ResponseEntity<Person> updateExistingPerson(@RequestBody PutExistingPersonRequest putExistingPersonRequest,
+    public ResponseEntity<LPRestResponse<Person>> updateExistingPerson(@RequestBody PutExistingPersonRequest putExistingPersonRequest,
                                                        @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
                                                        @PathVariable("personBusinessId") String personBusinessId) {
         try {
+            LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             UpdateExistingPersonCommand updateExistingPersonCommand =
                     putExistingPersonRequestToCommandConverter.toCommand(personBusinessId, putExistingPersonRequest);
             ValidationUtils.validateUUID(updateExistingPersonCommand.getBusinessId());
             PersonCommandValidator.validateUpdateExistingPersonCommand(updateExistingPersonCommand);
-            return new ResponseEntity<>(personService.updateExistingPerson(updateExistingPersonCommand), HttpStatus.OK);
+            Person updatedPerson = personService.updateExistingPerson(updateExistingPersonCommand);
+            LPRestResponse<Person> response = LPRestResponse.<Person>builder()
+                    .payload(updatedPerson)
+                    .detailedInfo(restResponseDetailedInfoCreator.create(restRequestContext, HttpStatus.OK))
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             throw new LPException("Error while updating an existing person", e)
                     .withPersonBusinessId(personBusinessId);
@@ -105,4 +127,8 @@ public class PersonController {
                     .withPersonBusinessId(personBusinessId);
         }
     }
+
+    // Workaround for Swagger generic responses...
+    // https://stackoverflow.com/a/48643021/1534456
+    static class PersonResponse extends LPRestResponse<Person>{}
 }
