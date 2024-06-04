@@ -21,7 +21,7 @@ public class PostCertificateRequest {
     @Schema(type = "string",
             description = "Start date of the contract",
             format = "date",
-            example = "2020-02-17",
+            example = "2000-02-17",
             requiredMode = REQUIRED)
     private LocalDate startDate;
 
