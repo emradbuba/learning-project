@@ -23,7 +23,7 @@ public class PutIdCardRequest {
     @Schema(type = "string",
             description = "New validity date",
             format = "date",
-            example = "2020-02-17",
+            example = "2000-02-17",
             requiredMode = REQUIRED)
     private LocalDate validUntil;
 
