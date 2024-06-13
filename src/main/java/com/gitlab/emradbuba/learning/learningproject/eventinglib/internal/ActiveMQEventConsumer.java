@@ -1,6 +1,5 @@
-package com.gitlab.emradbuba.learning.learningproject.events.consumer;
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
 
-import com.gitlab.emradbuba.learning.learningproject.events.LearningBrokerConfig;
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class LearningMessageConsumer {
-    private final LearningBrokerConfig learningBrokerConfig;
+public class ActiveMQEventConsumer {
+    private final EventingProperties eventingProperties;
 
     private Connection connection = null;
     private Session session = null;
@@ -21,9 +20,9 @@ public class LearningMessageConsumer {
     private void startListening() throws JMSException {
         // Create ConnectionFactory for a broker using specified credentials...
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
-                learningBrokerConfig.getBrokerUrl(),
-                learningBrokerConfig.getUsername(),
-                learningBrokerConfig.getPassword()
+                eventingProperties.getBrokerUrl(),
+                eventingProperties.getUsername(),
+                eventingProperties.getPassword()
         );
 
         // Get a connection from connectionFactory and start it....

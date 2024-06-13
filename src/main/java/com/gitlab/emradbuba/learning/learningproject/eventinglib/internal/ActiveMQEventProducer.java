@@ -1,32 +1,42 @@
-package com.gitlab.emradbuba.learning.learningproject.events.producer;
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
 
-import com.gitlab.emradbuba.learning.learningproject.events.LearningBrokerConfig;
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-@Component
-@RequiredArgsConstructor
-public class LearningMessageProducer {
-    private final LearningBrokerConfig learningBrokerConfig;
+@Slf4j
+public class ActiveMQEventProducer {
+
+    private final EventingPropertiesInternal eventingPropertiesInternal;
+
+    public ActiveMQEventProducer(EventingPropertiesInternal eventingPropertiesInternal) {
+        this.eventingPropertiesInternal = eventingPropertiesInternal;
+    }
 
     private Connection connection = null;
     private Session session = null;
-    private MessageProducer producer = null;
+    private EventProducer producer = null;
+    private String producerName = null;
+
+    public void start() {
+        try {
+            startProducer();
+        } catch (JMSException e) {
+            System.err.println("[PRODUCER] Starting... FAILED");
+            System.err.println(e.getMessage());
+        }
+    }
 
     private void startProducer() throws JMSException {
 
         // Create ConnectionFactory for a broker using specified credentials...
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
-                learningBrokerConfig.getBrokerUrl(),
-                learningBrokerConfig.getUsername(),
-                learningBrokerConfig.getPassword()
+                eventingPropertiesInternal.getBrokerUrl(),
+                eventingPropertiesInternal.getUsername(),
+                eventingPropertiesInternal.getPassword()
         );
 
         // Get a connection from connectionFactory and start it....
@@ -50,18 +60,7 @@ public class LearningMessageProducer {
         producer.send(textMessage);
     }
 
-    @EventListener(ApplicationStartedEvent.class)
-    public void onApplicationStart() {
-        try {
-            System.out.println("[PRODUCER] Starting...");
-            startProducer();
-            System.out.println("[PRODUCER] Starting... OK");
-        } catch (JMSException e) {
-            // TODO: Handle the flow...
-            System.err.println("[PRODUCER] Starting... FAILED");
-            System.err.println(e.getMessage());
-        }
-    }
+
 
     @PreDestroy // TODO: ok?
     private void stopListening() {
