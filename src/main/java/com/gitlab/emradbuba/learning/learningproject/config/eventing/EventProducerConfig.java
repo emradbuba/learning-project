@@ -28,6 +28,7 @@ public class EventProducerConfig {
     @Bean
     public EventProducer amqEventProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
+                .producerName(producerName)
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .brokerName(amqBrokerName)
@@ -36,11 +37,11 @@ public class EventProducerConfig {
                         .brokerPassword(amqBrokerPassword)
                         .build())
                 .eventProducerDestinationSettings(EventProducerDestinationSettings.builder()
-                        .producerName(producerName)
                         .destinationName(producerDestinationName)
-                        .eventingApproachType(EventingApproachType.PUBLISHER_SUBSCRIBER)
+                        .eventCommunicationModel(EventCommunicationModel.VIRTUAL_TOPIC_BASED)
                         .build())
                 .build();
+
         return EventProducerFactory.createEventProducer(eventProducerSettings);
     }
 }

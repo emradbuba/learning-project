@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsInternal;
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
@@ -10,16 +11,18 @@ import java.util.UUID;
 @Slf4j
 public class ActiveMQEventProducer {
 
-    private final EventingPropertiesInternal eventingPropertiesInternal;
+    private final EventProducerSettingsInternal eventingPropertiesInternal;
+    private final String producerName;
 
-    public ActiveMQEventProducer(EventingPropertiesInternal eventingPropertiesInternal) {
+    public ActiveMQEventProducer(EventProducerSettingsInternal eventingPropertiesInternal) {
+        // TODO: Create AMQ producer using internal settings...
         this.eventingPropertiesInternal = eventingPropertiesInternal;
+        this.producerName = eventingPropertiesInternal.getProducerName();
     }
 
     private Connection connection = null;
     private Session session = null;
-    private EventProducer producer = null;
-    private String producerName = null;
+    private MessageProducer producer = null;
 
     public void start() {
         try {
@@ -35,8 +38,8 @@ public class ActiveMQEventProducer {
         // Create ConnectionFactory for a broker using specified credentials...
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 eventingPropertiesInternal.getBrokerUrl(),
-                eventingPropertiesInternal.getUsername(),
-                eventingPropertiesInternal.getPassword()
+                eventingPropertiesInternal.getBrokerUsername(),
+                eventingPropertiesInternal.getBrokerPassword()
         );
 
         // Get a connection from connectionFactory and start it....

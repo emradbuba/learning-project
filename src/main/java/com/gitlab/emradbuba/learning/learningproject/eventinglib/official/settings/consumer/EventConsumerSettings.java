@@ -9,5 +9,5 @@ import lombok.Getter;
 public class EventConsumerSettings {
     private final String consumerName;
     private final EventBrokerSettings eventBrokerSettings;
-    private final EventConsumerQueueSettings eventConsumerQueueSettings;
+    private final EventConsumerSourceSettings eventConsumerSourceSettings;
 }
