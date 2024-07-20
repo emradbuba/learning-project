@@ -40,7 +40,7 @@ public class EventConsumerConfig {
                         .build())
                 .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
                         .sourceName(consumerSourceName)
-                        .eventCommunicationModel(EventCommunicationModel.VIRTUAL_TOPIC_BASED)
+                        .eventCommunicationModel(EventCommunicationModel.VIA_VIRTUAL_TOPIC)
                         .build())
                 .build();
 

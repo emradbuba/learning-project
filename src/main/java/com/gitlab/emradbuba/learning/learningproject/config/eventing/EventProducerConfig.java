@@ -38,7 +38,7 @@ public class EventProducerConfig {
                         .build())
                 .eventProducerDestinationSettings(EventProducerDestinationSettings.builder()
                         .destinationName(producerDestinationName)
-                        .eventCommunicationModel(EventCommunicationModel.VIRTUAL_TOPIC_BASED)
+                        .eventCommunicationModel(EventCommunicationModel.VIA_VIRTUAL_TOPIC)
                         .build())
                 .build();
 

@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings;
 
 public enum EventCommunicationModel {
-    QUEUE_BASED,
-    TOPIC_BASED,
-    VIRTUAL_TOPIC_BASED;
+    VIA_QUEUE,
+    VIA_TOPIC,
+    VIA_VIRTUAL_TOPIC;
 }

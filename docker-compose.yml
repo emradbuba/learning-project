@@ -19,3 +19,6 @@ services:
       - type: volume
         source: test-vol
         target: /app
+
+# TODO: define a service for ActiveMQ broker
+# TODO: introduce profiles so you can run docker-compose with local (only broker) or full (broker and app itself) modes.

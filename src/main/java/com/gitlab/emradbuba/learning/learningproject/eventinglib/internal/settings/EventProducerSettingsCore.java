@@ -5,11 +5,13 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Getter
-public class EventProducerSettingsInternal {
+public class EventProducerSettingsCore {
 
     private final String producerName;
     private final String brokerName;
@@ -17,9 +19,10 @@ public class EventProducerSettingsInternal {
     private final String brokerUsername;
     private final String brokerPassword;
     private final String destinationName;
+    private final EventBrokerType eventBrokerType;
     private final EventCommunicationModel eventCommunicationModel;
 
-    public EventProducerSettingsInternal(final EventProducerSettings eventProducerSettings) {
+    public EventProducerSettingsCore(final EventProducerSettings eventProducerSettings) {
         EventProducerSettingsValidator.validateIncomingSettings(eventProducerSettings);
 
         this.brokerName = trim(eventProducerSettings.getEventBrokerSettings().getBrokerName());
@@ -27,7 +30,15 @@ public class EventProducerSettingsInternal {
         this.brokerUsername = trim(eventProducerSettings.getEventBrokerSettings().getBrokerUsername());
         this.brokerPassword = trim(eventProducerSettings.getEventBrokerSettings().getBrokerPassword());
         this.producerName = trim(eventProducerSettings.getProducerName());
-        this.destinationName = trim(eventProducerSettings.getEventProducerDestinationSettings().getDestinationName());
+        this.destinationName = normalizeDestinationNameAgainstAmqVirtualTopic(eventProducerSettings); // TODO: AMQ-specific part in abstract code!
+        this.eventBrokerType = eventProducerSettings.getEventBrokerSettings().getEventBrokerType();
         this.eventCommunicationModel = eventProducerSettings.getEventProducerDestinationSettings().getEventCommunicationModel();
+    }
+
+    private static String normalizeDestinationNameAgainstAmqVirtualTopic(EventProducerSettings eventProducerSettings) {
+        final String originalName = eventProducerSettings.getEventProducerDestinationSettings().getDestinationName().trim();
+        return StringUtils.startsWithIgnoreCase(originalName, AMQ_VIRTUAL_TOPIC_PREFIX)
+                ? originalName.substring(AMQ_VIRTUAL_TOPIC_PREFIX.length())
+                : originalName;
     }
 }

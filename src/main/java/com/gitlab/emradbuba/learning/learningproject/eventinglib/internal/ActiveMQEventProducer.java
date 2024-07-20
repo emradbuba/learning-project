@@ -1,7 +1,9 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsInternal;
-import jakarta.annotation.PreDestroy;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
@@ -9,33 +11,35 @@ import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import java.util.UUID;
 
 @Slf4j
-public class ActiveMQEventProducer {
+public class ActiveMQEventProducer implements EventProducer, EventHandlingEntityLifecycle {
 
-    private final EventProducerSettingsInternal eventingPropertiesInternal;
+    public static final String AMQ_VIRTUAL_TOPIC_PREFIX = "VirtualTopic.";
+    private final EventProducerSettingsCore eventingPropertiesInternal;
     private final String producerName;
-
-    public ActiveMQEventProducer(EventProducerSettingsInternal eventingPropertiesInternal) {
-        // TODO: Create AMQ producer using internal settings...
-        this.eventingPropertiesInternal = eventingPropertiesInternal;
-        this.producerName = eventingPropertiesInternal.getProducerName();
-    }
 
     private Connection connection = null;
     private Session session = null;
     private MessageProducer producer = null;
+    private boolean isRunning = false;
 
+    public ActiveMQEventProducer(EventProducerSettingsCore eventingPropertiesInternal) {
+        this.producerName = eventingPropertiesInternal.getProducerName();
+        this.eventingPropertiesInternal = eventingPropertiesInternal;
+    }
+
+    @Override
     public void start() {
         try {
-            startProducer();
+            if (!isRunning) {
+                startProducer();
+            }
         } catch (JMSException e) {
-            System.err.println("[PRODUCER] Starting... FAILED");
-            System.err.println(e.getMessage());
+            log.error(String.format("Cannot start event producer '%s'", producerName), e);
         }
     }
 
     private void startProducer() throws JMSException {
-
-        // Create ConnectionFactory for a broker using specified credentials...
+        log.info("Starting the event producer '{}'...", producerName);
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 eventingPropertiesInternal.getBrokerUrl(),
                 eventingPropertiesInternal.getBrokerUsername(),
@@ -50,10 +54,26 @@ public class ActiveMQEventProducer {
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         // Create a Queue or Topic (will be created automatically by ActiveMQ if it doesn't exist)
-        Queue queue = session.createQueue("exampleQueue");
+        Destination producerDestination = createProducerDestination();
 
-        // Create a MessageConsumer from the Session to the Queue
-        producer = session.createProducer(queue);
+        // Create a MessageConsumer from the Session to the Destination
+        producer = session.createProducer(producerDestination);
+        log.info("Successfully created AMQ message producer '{}'", producerName);
+        isRunning = true;
+    }
+
+    private Destination createProducerDestination() throws JMSException {
+        String destinationName = eventingPropertiesInternal.getDestinationName();
+        if (eventingPropertiesInternal.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
+            log.info("Creating AMQ queue '{}'...", destinationName);
+            return session.createQueue(destinationName);
+        }
+        if (eventingPropertiesInternal.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
+            log.info("Creating AMQ topic '{}'...", destinationName);
+            return session.createTopic(destinationName);
+        }
+        log.info("Creating AMQ virtual topic '{}'...", destinationName);
+        return session.createTopic(AMQ_VIRTUAL_TOPIC_PREFIX + destinationName);
     }
 
     public void produceMessage() throws JMSException {
@@ -63,28 +83,29 @@ public class ActiveMQEventProducer {
         producer.send(textMessage);
     }
 
-
-
-    @PreDestroy // TODO: ok?
-    private void stopListening() {
+    @Override
+    public void stop() {
+        log.info("Stopping event producer '{}'...", producerName);
+        if (!isRunning) {
+            log.info("Producer not running - stopping not necessary");
+            return;
+        }
         try {
-
             if (producer != null) {
+                log.info("Closing producer {}...", producerName);
                 producer.close();
-
-                System.out.println("[PRODUCER] JMS Cleanup... Producer closed");
             }
             if (session != null) {
+                log.info("Closing producer's {} session...", producerName);
                 session.close();
-                System.out.println("[PRODUCER] JMS Cleanup... Producer closed");
             }
             if (connection != null) {
-                System.out.println("[PRODUCER] JMS Cleanup... Producer closed");
+                log.info("Closing producer's {} connection...", producerName);
                 connection.close();
             }
-            System.out.println("[PRODUCER] JMS Cleanup... SUCCESS");
+            isRunning = false;
         } catch (JMSException e) {
-            System.err.println("[PRODUCER] JMS Cleanup... FAILED");
+            log.error(String.format("Error while stopping '%s' event consumer!", producerName), e);
         }
     }
 }
