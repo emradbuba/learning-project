@@ -29,6 +29,33 @@
 > to `produces` attribute. 
 </details>
 
+<br>
+<details>
+<summary>How to run logic on SpringBoot start? What are the ways?</summary>
+
+See this article: [LINK](https://www.baeldung.com/running-setup-logic-on-startup-in-spring)
+
+> * @PostConstruct
+> * `InitializingBean` interface
+> * `ApplicationListener`
+> * `@Bean` initMethod attribute
+> * Injecting logic into constructor
+> * `ApplicationRunner`
+
+</details>
+
+<details>
+<summary>How to run logic before SpringBoot quits? What are the ways?</summary>
+
+See this article: [LINK](https://www.baeldung.com/spring-shutdown-callbacks)
+
+> * `@PreDestroy`
+> * `DisposableBean` interface
+> * Bean-destroy method
+> * Global `ServletContextListener`
+
+</details>
+
 ### TODO
 * What does the `@Configuration` annotation mean?
 * `ContextLoaderListener` used to load Spring beans

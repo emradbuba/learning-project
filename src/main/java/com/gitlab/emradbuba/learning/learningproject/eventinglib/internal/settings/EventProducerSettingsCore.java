@@ -7,7 +7,7 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Getter

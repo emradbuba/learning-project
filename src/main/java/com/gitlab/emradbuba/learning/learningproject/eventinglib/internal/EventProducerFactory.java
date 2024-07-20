@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.ActiveMQEventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;

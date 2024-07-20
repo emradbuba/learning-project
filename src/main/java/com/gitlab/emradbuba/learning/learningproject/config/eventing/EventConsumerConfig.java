@@ -24,7 +24,7 @@ public class EventConsumerConfig {
     private String amqBrokerPassword;
     @Value("${eventing.amq.consumer.name}")
     private String consumerName;
-    @Value("${eventing.amq.customer.sourceName}")
+    @Value("${eventing.amq.consumer.sourceName}")
     private String consumerSourceName;
 
     @Bean

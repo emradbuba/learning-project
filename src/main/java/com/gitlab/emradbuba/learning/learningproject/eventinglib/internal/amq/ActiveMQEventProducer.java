@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal;
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
