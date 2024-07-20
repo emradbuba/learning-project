@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ActiveMQEventProducer implements EventProducer, EventHandlingEntityLifecycle {
 
     public static final String AMQ_VIRTUAL_TOPIC_PREFIX = "VirtualTopic.";
-    private final EventProducerSettingsCore eventingPropertiesInternal;
+    private final EventProducerSettingsCore eventProducerSettingsCore;
     private final String producerName;
 
     private Connection connection = null;
@@ -22,9 +22,9 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     private MessageProducer producer = null;
     private boolean isRunning = false;
 
-    public ActiveMQEventProducer(EventProducerSettingsCore eventingPropertiesInternal) {
-        this.producerName = eventingPropertiesInternal.getProducerName();
-        this.eventingPropertiesInternal = eventingPropertiesInternal;
+    public ActiveMQEventProducer(EventProducerSettingsCore eventProducerSettingsCore) {
+        this.producerName = eventProducerSettingsCore.getProducerName();
+        this.eventProducerSettingsCore = eventProducerSettingsCore;
     }
 
     @Override
@@ -41,9 +41,9 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     private void startProducer() throws JMSException {
         log.info("Starting the event producer '{}'...", producerName);
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
-                eventingPropertiesInternal.getBrokerUrl(),
-                eventingPropertiesInternal.getBrokerUsername(),
-                eventingPropertiesInternal.getBrokerPassword()
+                eventProducerSettingsCore.getBrokerUrl(),
+                eventProducerSettingsCore.getBrokerUsername(),
+                eventProducerSettingsCore.getBrokerPassword()
         );
 
         // Get a connection from connectionFactory and start it....
@@ -63,12 +63,12 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     }
 
     private Destination createProducerDestination() throws JMSException {
-        String destinationName = eventingPropertiesInternal.getDestinationName();
-        if (eventingPropertiesInternal.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
+        String destinationName = eventProducerSettingsCore.getDestinationName();
+        if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
             log.info("Creating AMQ queue '{}'...", destinationName);
             return session.createQueue(destinationName);
         }
-        if (eventingPropertiesInternal.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
+        if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
             log.info("Creating AMQ topic '{}'...", destinationName);
             return session.createTopic(destinationName);
         }
@@ -76,11 +76,15 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
         return session.createTopic(AMQ_VIRTUAL_TOPIC_PREFIX + destinationName);
     }
 
-    public void produceMessage() throws JMSException {
+    public void produceMessage() {
         String randomString = UUID.randomUUID().toString().substring(0, 8);
-        System.out.println("Sending message <" + randomString + ">");
-        TextMessage textMessage = session.createTextMessage(randomString);
-        producer.send(textMessage);
+        try {
+            System.out.println("Sending message <" + randomString + ">");
+            TextMessage textMessage = session.createTextMessage(randomString);
+            producer.send(textMessage);
+        } catch (JMSException e) {
+            log.error("Could not produce a message with randomString={}", randomString);
+        }
     }
 
     @Override

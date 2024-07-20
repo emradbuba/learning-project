@@ -1,6 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerDestinationSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
@@ -36,11 +37,20 @@ public class EventProducerSettingsValidator {
         final String brokerName = brokerSettings.getBrokerName();
         final String brokerUsername = brokerSettings.getBrokerUsername();
         final String brokerPassword = brokerSettings.getBrokerPassword();
+        final EventBrokerType eventBrokerType = brokerSettings.getEventBrokerType();
 
         validateBrokerUrl(brokerUrl, producerName);
+        validateEventBrokerType(eventBrokerType, producerName);
         validateIfStringDefined(brokerName, "brokerName", producerName);
         validateIfStringDefined(brokerUsername, "brokerUsername", producerName);
         validateIfStringDefined(brokerPassword, "brokerPassword", producerName);
+    }
+
+    private static void validateEventBrokerType(EventBrokerType eventBrokerType, String producerName) {
+        if (eventBrokerType == null) {
+            throw new IllegalArgumentException(
+                    String.format("Incorrect settings of the '%s' event producer - eventBrokerType cannot be null", producerName));
+        }
     }
 
     private static void validateDestinationSettings(final EventProducerSettings eventProducerSettings) {
@@ -65,7 +75,7 @@ public class EventProducerSettingsValidator {
         validateIfStringDefined(urlString, "brokerUrl", producerName);
         if (!UrlUtils.isAbsoluteUrl(urlString)) {
             throw new IllegalArgumentException(
-                    String.format("Incorrect brokerUrl for '%s' event producer - check you settings", producerName));
+                    String.format("Incorrect brokerUrl for '%s' event producer - check your settings", producerName));
         }
     }
 

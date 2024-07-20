@@ -8,6 +8,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRe
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponse;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,9 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @Tag(name = "Person management", description = "This part of API enables to manage persons")
 public class PersonController {
+
+    @Autowired
+    EventProducer eventProducer;
 
     private final PersonService personService;
     private final LPRestResponseDetailsCreator restResponseDetailedInfoCreator;
@@ -48,6 +53,7 @@ public class PersonController {
             @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
+            eventProducer.produceMessage();
             LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             Person person = personService.getPerson(personBusinessId);
             LPRestResponse<Person> response = LPRestResponse.<Person>builder()

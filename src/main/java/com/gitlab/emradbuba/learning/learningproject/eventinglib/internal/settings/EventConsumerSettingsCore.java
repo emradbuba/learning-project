@@ -1,0 +1,44 @@
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings;
+
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.validation.EventConsumerSettingsValidator;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
+import lombok.Getter;
+import org.springframework.util.StringUtils;
+
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
+import static org.apache.commons.lang3.StringUtils.trim;
+
+@Getter
+public class EventConsumerSettingsCore {
+
+    private final String consumerName;
+    private final String brokerName;
+    private final String brokerUrl;
+    private final String brokerUsername;
+    private final String brokerPassword;
+    private final String sourceName;
+    private final EventBrokerType eventBrokerType;
+    private final EventCommunicationModel eventCommunicationModel;
+
+    public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
+        EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
+
+        this.consumerName = trim(eventConsumerSettings.getConsumerName());
+        this.brokerName = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerName());
+        this.brokerUrl = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUrl());
+        this.brokerUsername = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUsername());
+        this.brokerPassword = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerPassword());
+        this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
+        this.sourceName = normalizeSourceNameAgainstAmqVirtualTopic(eventConsumerSettings); // TODO: AMQ-specific part in abstract code!
+        this.eventCommunicationModel = eventConsumerSettings.getEventConsumerSourceSettings().getEventCommunicationModel();
+    }
+
+    private static String normalizeSourceNameAgainstAmqVirtualTopic(EventConsumerSettings eventConsumerSettings) {
+        final String originalName = eventConsumerSettings.getEventConsumerSourceSettings().getSourceName().trim();
+        return StringUtils.startsWithIgnoreCase(originalName, AMQ_VIRTUAL_TOPIC_PREFIX)
+                ? originalName.substring(AMQ_VIRTUAL_TOPIC_PREFIX.length())
+                : originalName;
+    }
+}
