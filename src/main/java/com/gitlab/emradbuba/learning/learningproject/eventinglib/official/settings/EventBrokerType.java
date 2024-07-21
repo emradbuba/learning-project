@@ -2,5 +2,6 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.setti
 
 public enum EventBrokerType {
     ACTIVE_MQ,
-    // RABBIT_MQ
+    RABBIT_MQ,
+    KAFFKA
 }

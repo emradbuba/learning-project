@@ -3,12 +3,10 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-
-import java.util.UUID;
 
 @Slf4j
 public class ActiveMQEventProducer implements EventProducer, EventHandlingEntityLifecycle {
@@ -66,11 +64,11 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
 
     private Destination createProducerDestination() throws JMSException {
         String destinationName = eventProducerSettingsCore.getDestinationName();
-        if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
+        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_QUEUE) {
             log.info("EventProducer '{}': Creating queue '{}'...", producerName, destinationName);
             return session.createQueue(destinationName);
         }
-        if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
+        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_TOPIC) {
             log.info("EventProducer '{}': Creating topic '{}'...", producerName, destinationName);
             return session.createTopic(destinationName);
         }

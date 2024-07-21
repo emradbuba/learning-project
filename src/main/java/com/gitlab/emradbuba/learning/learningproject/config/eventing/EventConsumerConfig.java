@@ -4,7 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.EventC
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSourceSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,8 +39,8 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
-                        .sourceName(consumerSourceName)
-                        .eventCommunicationModel(EventCommunicationModel.VIA_VIRTUAL_TOPIC)
+                        .messageSourceName(consumerSourceName)
+                        .eventCommunicationModelType(EventCommunicationModelType.VIA_VIRTUAL_TOPIC)
                         .build())
                 .build();
 

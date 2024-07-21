@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.setti
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerDestinationSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -56,8 +56,8 @@ public class EventProducerSettingsValidator {
     private static void validateDestinationSettings(final EventProducerSettings eventProducerSettings) {
         final String producerName = eventProducerSettings.getProducerName();
         final EventProducerDestinationSettings destinationSettings = eventProducerSettings.getEventProducerDestinationSettings();
-        final String destinationName = destinationSettings.getDestinationName();
-        final EventCommunicationModel communicationModel = destinationSettings.getEventCommunicationModel();
+        final String destinationName = destinationSettings.getMessageDestinationName();
+        final EventCommunicationModelType communicationModel = destinationSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(destinationName, "destinationName", producerName);
         validateIfCommunicationModelDefined(communicationModel, producerName);
@@ -79,7 +79,7 @@ public class EventProducerSettingsValidator {
         }
     }
 
-    private static void validateIfCommunicationModelDefined(EventCommunicationModel communicationModel, String producerName) {
+    private static void validateIfCommunicationModelDefined(EventCommunicationModelType communicationModel, String producerName) {
         if (communicationModel == null) {
             throw new IllegalArgumentException(
                     String.format("Incorrect settings of the '%s' event producer - communicationModel cannot be null", producerName));

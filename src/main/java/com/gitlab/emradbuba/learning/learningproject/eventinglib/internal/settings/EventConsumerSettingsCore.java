@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.setti
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.validation.EventConsumerSettingsValidator;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
@@ -20,7 +20,7 @@ public class EventConsumerSettingsCore {
     private final String brokerPassword;
     private final String sourceName;
     private final EventBrokerType eventBrokerType;
-    private final EventCommunicationModel eventCommunicationModel;
+    private final EventCommunicationModelType eventCommunicationModelType;
 
     public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
         EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
@@ -32,11 +32,11 @@ public class EventConsumerSettingsCore {
         this.brokerPassword = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerPassword());
         this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
         this.sourceName = normalizeSourceNameAgainstAmqVirtualTopic(eventConsumerSettings); // TODO: AMQ-specific part in abstract code!
-        this.eventCommunicationModel = eventConsumerSettings.getEventConsumerSourceSettings().getEventCommunicationModel();
+        this.eventCommunicationModelType = eventConsumerSettings.getEventConsumerSourceSettings().getEventCommunicationModelType();
     }
 
     private static String normalizeSourceNameAgainstAmqVirtualTopic(EventConsumerSettings eventConsumerSettings) {
-        final String originalName = eventConsumerSettings.getEventConsumerSourceSettings().getSourceName().trim();
+        final String originalName = eventConsumerSettings.getEventConsumerSourceSettings().getMessageSourceName().trim();
         return StringUtils.startsWithIgnoreCase(originalName, AMQ_VIRTUAL_TOPIC_PREFIX)
                 ? originalName.substring(AMQ_VIRTUAL_TOPIC_PREFIX.length())
                 : originalName;

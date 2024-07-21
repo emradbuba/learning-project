@@ -1,12 +1,12 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
 public class EventProducerDestinationSettings {
-    private final String destinationName;
-    private final EventCommunicationModel eventCommunicationModel;
+    private final String messageDestinationName;
+    private final EventCommunicationModelType eventCommunicationModelType;
 }

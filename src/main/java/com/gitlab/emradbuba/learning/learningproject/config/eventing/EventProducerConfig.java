@@ -37,8 +37,8 @@ public class EventProducerConfig {
                         .brokerPassword(amqBrokerPassword)
                         .build())
                 .eventProducerDestinationSettings(EventProducerDestinationSettings.builder()
-                        .destinationName(producerDestinationName)
-                        .eventCommunicationModel(EventCommunicationModel.VIA_VIRTUAL_TOPIC)
+                        .messageDestinationName(producerDestinationName)
+                        .eventCommunicationModelType(EventCommunicationModelType.VIA_VIRTUAL_TOPIC)
                         .build())
                 .build();
 

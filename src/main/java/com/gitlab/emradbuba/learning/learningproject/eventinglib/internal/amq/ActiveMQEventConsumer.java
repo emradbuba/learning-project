@@ -3,7 +3,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
@@ -71,11 +71,11 @@ public class ActiveMQEventConsumer implements EventConsumer, EventHandlingEntity
 
     private Destination createSourceDestination() throws JMSException {
         String sourceName = eventConsumerSettingsCore.getSourceName();
-        if (eventConsumerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
+        if (eventConsumerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_QUEUE) {
             log.info("EventConsumer '{}': Creating queue '{}'...", consumerName, sourceName);
             return session.createQueue(sourceName);
         }
-        if (eventConsumerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
+        if (eventConsumerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_TOPIC) {
             log.info("EventConsumer '{}': Creating topic '{}'...", consumerName, sourceName);
             return session.createTopic(sourceName);
         }

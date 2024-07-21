@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.setti
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModel;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSourceSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -55,8 +55,8 @@ public class EventConsumerSettingsValidator {
     private static void validateSourceSettings(final EventConsumerSettings eventConsumerSettings) {
         final String consumerName = eventConsumerSettings.getConsumerName();
         final EventConsumerSourceSettings sourceSettings = eventConsumerSettings.getEventConsumerSourceSettings();
-        final String sourceName = sourceSettings.getSourceName();
-        final EventCommunicationModel communicationModel = sourceSettings.getEventCommunicationModel();
+        final String sourceName = sourceSettings.getMessageSourceName();
+        final EventCommunicationModelType communicationModel = sourceSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(sourceName, "sourceName", consumerName);
         validateIfCommunicationModelDefined(communicationModel, consumerName);
@@ -78,7 +78,7 @@ public class EventConsumerSettingsValidator {
         }
     }
 
-    private static void validateIfCommunicationModelDefined(EventCommunicationModel communicationModel, String consumerName) {
+    private static void validateIfCommunicationModelDefined(EventCommunicationModelType communicationModel, String consumerName) {
         if (communicationModel == null) {
             throw new IllegalArgumentException(
                     String.format("Incorrect settings of the '%s' event consumer - communicationModel cannot be null", consumerName));
