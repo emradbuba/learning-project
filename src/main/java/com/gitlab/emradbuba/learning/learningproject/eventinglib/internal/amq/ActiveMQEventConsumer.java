@@ -29,56 +29,59 @@ public class ActiveMQEventConsumer implements EventConsumer, EventHandlingEntity
     }
 
     private void startListening() throws JMSException {
-        // Create ConnectionFactory for a broker using specified credentials...
-        log.info("Starting the event consumer '{}'...", consumerName);
+
+        log.info("EventConsumer '{}': Starting...", consumerName);
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 eventConsumerSettingsCore.getBrokerUrl(),
                 eventConsumerSettingsCore.getBrokerUsername(),
                 eventConsumerSettingsCore.getBrokerPassword()
         );
 
-        // Get a connection from connectionFactory and start it....
+        log.info("EventConsumer '{}': Creating connection...", consumerName);
         connection = connectionFactory.createConnection();
+        connection.setClientID("TestClientId"); // TODO: <-- get it from user configurable settings
         connection.start();
 
-        // Create a session having a connection...
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        log.info("EventConsumer '{}': Creating session...", consumerName);
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); // <-- TODO: Ack modes, transacted?
 
-        // Create a Queue or Topic (will be created automatically by ActiveMQ if it doesn't exist)
         Destination destination = createSourceDestination();
 
-        // Create a MessageConsumer from the Session to the Queue
-        consumer = session.createConsumer(destination);
-        // Listen for incoming messages
-        consumer.setMessageListener(new MessageListener() {
+        log.info("EventConsumer '{}': Creating AMQ message consumer...", consumerName);
+        consumer = session.createConsumer(destination); // TODO: durable / shared / consumer ??
+
+        log.info("EventConsumer '{}': Adding message listener...", consumerName);
+        consumer.setMessageListener(new MessageListener() { // TODO: listener should be separate
             @Override
             public void onMessage(Message message) {
                 if (message instanceof TextMessage) {
                     try {
                         TextMessage textMessage = (TextMessage) message;
                         String s = textMessage.getText();
-                        System.out.println("Consuming message: " + s);
+                        log.info("Consuming message: <{}>", s);
                         textMessage.acknowledge();
                     } catch (JMSException e) {
-                        System.err.println("Could not read message...");
+                        log.error("Could not read message...");
                     }
                 }
             }
         });
+        log.info("EventConsumer '{}': STARTED SUCCESSFULLY...", consumerName);
     }
 
     private Destination createSourceDestination() throws JMSException {
         String sourceName = eventConsumerSettingsCore.getSourceName();
         if (eventConsumerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
-            log.info("Creating AMQ queue '{}'...", sourceName);
+            log.info("EventConsumer '{}': Creating queue '{}'...", consumerName, sourceName);
             return session.createQueue(sourceName);
         }
         if (eventConsumerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
-            log.info("Creating AMQ topic '{}'...", sourceName);
+            log.info("EventConsumer '{}': Creating topic '{}'...", consumerName, sourceName);
             return session.createTopic(sourceName);
         }
-        log.info("Creating AMQ virtual topic '{}'...", sourceName);
-        return session.createTopic(AMQ_VIRTUAL_TOPIC_PREFIX + sourceName);
+        String virtualTopicSourceName = AMQ_VIRTUAL_TOPIC_PREFIX + sourceName;
+        log.info("EventConsumer '{}': Creating VirtualTopic '{}'...", consumerName, virtualTopicSourceName);
+        return session.createTopic(virtualTopicSourceName);
     }
 
     @EventListener(ApplicationStartedEvent.class)

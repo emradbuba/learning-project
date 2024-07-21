@@ -23,6 +23,5 @@ public final class ValidationUtils {
                     .withDescription(LPServiceExceptionErrorCode.INCORRECT_UUID_FORMAT.getDescription());
 
         }
-
     }
 }

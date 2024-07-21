@@ -39,7 +39,7 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     }
 
     private void startProducer() throws JMSException {
-        log.info("Starting the event producer '{}'...", producerName);
+        log.info("EventProducer '{}': Starting...", producerName);
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 eventProducerSettingsCore.getBrokerUrl(),
                 eventProducerSettingsCore.getBrokerUsername(),
@@ -47,10 +47,12 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
         );
 
         // Get a connection from connectionFactory and start it....
+        log.info("EventProducer '{}': Creating connection...", producerName);
         connection = connectionFactory.createConnection();
         connection.start();
 
         // Create a session having a connection...
+        log.info("EventProducer '{}': Creating session...", producerName);
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         // Create a Queue or Topic (will be created automatically by ActiveMQ if it doesn't exist)
@@ -65,25 +67,26 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     private Destination createProducerDestination() throws JMSException {
         String destinationName = eventProducerSettingsCore.getDestinationName();
         if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_QUEUE) {
-            log.info("Creating AMQ queue '{}'...", destinationName);
+            log.info("EventProducer '{}': Creating queue '{}'...", producerName, destinationName);
             return session.createQueue(destinationName);
         }
         if (eventProducerSettingsCore.getEventCommunicationModel() == EventCommunicationModel.VIA_TOPIC) {
-            log.info("Creating AMQ topic '{}'...", destinationName);
+            log.info("EventProducer '{}': Creating topic '{}'...", producerName, destinationName);
             return session.createTopic(destinationName);
         }
-        log.info("Creating AMQ virtual topic '{}'...", destinationName);
-        return session.createTopic(AMQ_VIRTUAL_TOPIC_PREFIX + destinationName);
+
+        String virtualTopicName = AMQ_VIRTUAL_TOPIC_PREFIX + destinationName;
+        log.info("EventProducer '{}': Creating VirtualTopic '{}'...", producerName, destinationName);
+        return session.createTopic(virtualTopicName);
     }
 
-    public void produceMessage() {
-        String randomString = UUID.randomUUID().toString().substring(0, 8);
+    public void produceMessage(String text) {
         try {
-            System.out.println("Sending message <" + randomString + ">");
-            TextMessage textMessage = session.createTextMessage(randomString);
+            log.info("EventProducer '{}': Sending message <{}>", producerName, text);
+            TextMessage textMessage = session.createTextMessage(text);
             producer.send(textMessage);
         } catch (JMSException e) {
-            log.error("Could not produce a message with randomString={}", randomString);
+            log.error("Could not produce a message with text '{}'", text);
         }
     }
 

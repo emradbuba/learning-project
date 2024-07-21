@@ -30,6 +30,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/person")
 @AllArgsConstructor
@@ -53,7 +55,8 @@ public class PersonController {
             @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
-            eventProducer.produceMessage();
+            String randomString = UUID.randomUUID().toString().substring(0, 8);
+            eventProducer.produceMessage(randomString);
             LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             Person person = personService.getPerson(personBusinessId);
             LPRestResponse<Person> response = LPRestResponse.<Person>builder()

@@ -20,7 +20,9 @@ public enum LPServiceExceptionErrorCode {
     INCORRECT_CERT_CERT_ID_EMPTY("cert_cert_id_empty", "Certificate businessId must not be empty"),
     INCORRECT_CERT_DATES_NULL("cert_dates_not_specified", "Both, start and end dates, must be specified"),
     INCORRECT_CERT_DATES_RELATION("cert_dates_relation", "End date must be later than start date"),
-    INCORRECT_CERT_COMPANY_EMPTY("cert_company_empty", "Company name cannot be empty");
+    INCORRECT_CERT_COMPANY_EMPTY("cert_company_empty", "Company name cannot be empty"),
+
+    INCORRECT_EVENT_MESSAGE_TEXT("eventing_empty_message", "Event message text cannot be blank");
 
     private final String reasonCode;
     private final String description;
