@@ -1,6 +1,35 @@
 # About ActiveMQ
 
-## Virtual Topics and Consumers
+## Messaging Styles
+### Basic
+What are basic messaging styles in messaging systems also in AMQ?
+> <details>
+> <summary>Message Queue pattern (Queue)</summary>
+>
+> * Also called "point to point"
+> * One or many Consumers/Producers binded to the Queue 
+> * **Only one consumer** processes the message (like in "Orders" queue - order is processed only once)
+> * Message sent to queue is stored until consumed
+> * Consumer _acknowledges_ the message
+> </details>
+> <details>
+> <summary>Publish-Subscribe pattern (Topic)</summary>
+>
+> * Messages sent to a topic and consumers subsribe to this topic, so many can read
+> * Messages delivered to all subscribers (consumers)
+> * Message can be delivered "live" when consumer is active when message came
+> </details>
+
+### Extra in AMQ
+<details>
+<summary>What does it mean a "durable" subscription in AMQ? Is it for Topics and Queues? </summary>
+
+* For topics (publish/subscribe)
+* Durable - message is stored - even if everything crashes - until consumer consumes the message
+* NonDurable - message is saved only as long as the connection which creates the message exists...
+</details>
+
+## Virtual Topics and their Consumers
 
 This document provides an overview of how virtual topics work in Apache ActiveMQ, including naming conventions, how the broker identifies virtual topics, and when topics and queues are physically created on the broker.
 
