@@ -9,8 +9,8 @@ import com.gitlab.emradbuba.learning.learningproject.persistance.CertRepo;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.EmploymentCertificateEntity;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewCertificateCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.UpdateExistingCertificateCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.converters.CertificateEntityToCertificateConverter;
 import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceErrorUtils.createLPPersonNotFoundException;
 
-// TODO: Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
+// TODO: (Done?) Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
 
 @Service
 @AllArgsConstructor

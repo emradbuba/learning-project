@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.config;
+package com.gitlab.emradbuba.learning.learningproject.config.swagger;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;

@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.SendEventMessageCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.SendEventMessageCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import static com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils.validateUUID;

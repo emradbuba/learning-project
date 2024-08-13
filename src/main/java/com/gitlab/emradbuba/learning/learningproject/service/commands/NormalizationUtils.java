@@ -1,9 +1,9 @@
-package com.gitlab.emradbuba.learning.learningproject.api.converters;
+package com.gitlab.emradbuba.learning.learningproject.service.commands;
 
 import java.util.Optional;
 
-public final class MappingUtils {
-    private MappingUtils() {
+public final class NormalizationUtils {
+    private NormalizationUtils() {
         // prevent instantiation
     }
 

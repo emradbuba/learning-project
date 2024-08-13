@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.service.commands;
+package com.gitlab.emradbuba.learning.learningproject.service.commands.idcard;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Builder
 @Getter
-public class UpdateExistingIdCardCommand {
+public class AddNewIdCardCommand {
     private final String personBusinessId;
     private final String serialNumber;
     private final LocalDate validUntil;

@@ -1,9 +1,9 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
-import com.gitlab.emradbuba.learning.learningproject.api.converters.eventing.PostEventMessageRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.converter.PostEventMessageRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.eventing.PostEventMessageRequest;
 import com.gitlab.emradbuba.learning.learningproject.service.EventingService;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.SendEventMessageCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.SendEventMessageCommand;
 import com.gitlab.emradbuba.learning.learningproject.validation.EventMessageCommandValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -2,8 +2,8 @@ package com.gitlab.emradbuba.learning.learningproject.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewCertificateCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.UpdateExistingCertificateCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;

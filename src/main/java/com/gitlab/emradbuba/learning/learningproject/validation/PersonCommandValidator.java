@@ -2,8 +2,8 @@ package com.gitlab.emradbuba.learning.learningproject.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.AddNewPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.UpdateExistingPersonCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;

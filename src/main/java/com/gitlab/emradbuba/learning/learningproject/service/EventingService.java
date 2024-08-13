@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.SendEventMessageCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.SendEventMessageCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

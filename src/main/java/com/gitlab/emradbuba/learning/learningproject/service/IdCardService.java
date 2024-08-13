@@ -10,8 +10,8 @@ import com.gitlab.emradbuba.learning.learningproject.persistance.IdCardRepositor
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.IdCardEntity;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.UpdateExistingIdCardCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.converters.IdCardEntityToIdCardConverter;
 import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;

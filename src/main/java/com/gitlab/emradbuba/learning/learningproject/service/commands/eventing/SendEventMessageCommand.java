@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.service.commands;
+package com.gitlab.emradbuba.learning.learningproject.service.commands.eventing;
 
 import lombok.Builder;
 import lombok.Getter;

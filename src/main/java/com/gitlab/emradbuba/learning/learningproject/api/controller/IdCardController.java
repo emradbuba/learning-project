@@ -1,15 +1,15 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
-import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PostIdCardRequestToCommandConverter;
-import com.gitlab.emradbuba.learning.learningproject.api.converters.idcard.PutIdCardRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.converter.PostIdCardRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.converter.PutIdCardRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PostIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PutIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.IdCardService;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.UpdateExistingIdCardCommand;
 import com.gitlab.emradbuba.learning.learningproject.validation.IdCardCommandValidator;
 import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;

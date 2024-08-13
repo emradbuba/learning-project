@@ -1,16 +1,17 @@
 package com.gitlab.emradbuba.learning.learningproject.api.converters;
 
+import com.gitlab.emradbuba.learning.learningproject.service.commands.NormalizationUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MappingUtilsTest {
+class NormalizationUtilsTest {
 
     @Test
     void normalizeStringShouldReturnExpectedStringWhenWasAlreadyCorrect() {
         final String correctString = "correct-string";
 
-        String result = MappingUtils.normalizeString(correctString);
+        String result = NormalizationUtils.normalizeString(correctString);
 
         assertThat(result)
                 .isNotBlank()
@@ -21,7 +22,7 @@ class MappingUtilsTest {
     void normalizeStringShouldReturnExpectedStringWhenWasNeedsNormalization() {
         final String correctString = "correct-string";
 
-        String result = MappingUtils.normalizeString("   " + correctString + "     ");
+        String result = NormalizationUtils.normalizeString("   " + correctString + "     ");
 
         assertThat(result)
                 .isNotBlank()
@@ -30,7 +31,7 @@ class MappingUtilsTest {
 
     @Test
     void normalizeStringShouldReturnEmptyStringWhenNullInput() {
-        String result = MappingUtils.normalizeString(null);
+        String result = NormalizationUtils.normalizeString(null);
 
         assertThat(result)
                 .isNotNull()
@@ -39,7 +40,7 @@ class MappingUtilsTest {
 
     @Test
     void normalizeStringShouldReturnEmptyStringWhenEmptyInput() {
-        String result = MappingUtils.normalizeString("");
+        String result = NormalizationUtils.normalizeString("");
 
         assertThat(result)
                 .isNotNull()
@@ -48,7 +49,7 @@ class MappingUtilsTest {
 
     @Test
     void normalizeStringShouldReturnEmptyStringWhenEmptyInputAfterNormalization() {
-        String result = MappingUtils.normalizeString("    ");
+        String result = NormalizationUtils.normalizeString("    ");
 
         assertThat(result)
                 .isNotNull()

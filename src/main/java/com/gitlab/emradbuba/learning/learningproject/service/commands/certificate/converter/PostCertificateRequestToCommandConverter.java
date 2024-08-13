@@ -1,19 +1,18 @@
-package com.gitlab.emradbuba.learning.learningproject.api.converters.certificate;
+package com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.converter;
 
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.certificate.PostCertificateRequest;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.NormalizationUtils;
 import org.springframework.stereotype.Component;
-
-import static com.gitlab.emradbuba.learning.learningproject.api.converters.MappingUtils.normalizeString;
 
 @Component
 public class PostCertificateRequestToCommandConverter {
     public AddNewCertificateCommand toCommand(String personBusinessId, PostCertificateRequest postCertificateRequest) {
         return AddNewCertificateCommand.builder()
-                .personBusinessId(normalizeString(personBusinessId))
+                .personBusinessId(NormalizationUtils.normalizeString(personBusinessId))
                 .startDate(postCertificateRequest.getStartDate())
                 .endDate(postCertificateRequest.getEndDate())
-                .companyName(normalizeString(postCertificateRequest.getCompanyName()))
+                .companyName(NormalizationUtils.normalizeString(postCertificateRequest.getCompanyName()))
                 .build();
     }
 }

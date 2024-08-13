@@ -3,7 +3,7 @@ package com.gitlab.emradbuba.learning.learningproject.validation;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PutIdCardRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.AddNewIdCardCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
