@@ -1,6 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.autoconfig;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +24,16 @@ public class ProducerAutoStart {
     private void startProducerInstances() {
         log.info("AutoStart of event producers... Number of EventProducers found: {}", eventProducerBeans.size());
         this.eventProducerBeans.stream()
-                .filter(EventHandlingEntityLifecycle.class::isInstance)
-                .map(EventHandlingEntityLifecycle.class::cast)
-                .forEach(EventHandlingEntityLifecycle::start);
+                .filter(EventingLifecycleEntity.class::isInstance)
+                .map(EventingLifecycleEntity.class::cast)
+                .forEach(EventingLifecycleEntity::startEventingLifecycleEntity);
     }
 
     @PreDestroy
     private void stopProducerInstances() {
         this.eventProducerBeans.stream()
-                .filter(EventHandlingEntityLifecycle.class::isInstance)
-                .map(EventHandlingEntityLifecycle.class::cast)
-                .forEach(EventHandlingEntityLifecycle::stop);
+                .filter(EventingLifecycleEntity.class::isInstance)
+                .map(EventingLifecycleEntity.class::cast)
+                .forEach(EventingLifecycleEntity::stopEventingLifecycleEntity);
     }
 }

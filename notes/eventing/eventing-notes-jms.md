@@ -103,14 +103,47 @@ JMS is just a standard. There are also different inplementations of this standar
 > </details>
 </details>
 
+#### Durability and Sharing
+
 <details>
 <summary>What is a durable subscription?</summary>
 
-> By default, in topic based model, subscriber can receive messages sent after it has subscribed itself to a topic.
+>  It makes sense when we talk about topic case in "Publisher-Subscriber" model of communication.
+>  Normally (non-durable), when we create a consumer (a subscription) we: 
+>   * Create a connection (with uniqueID)
+>   * Create a session
+>   * Specify a destination
+>   * Start a connection
+> 
+> In this case broker will deliver messages to consumer as long as consumer is connected (connection is active)
 >
-> Durable subscription enables to get rid of this requirement, but it has to be configured first.
+> Durability means to receive also messages from time a subscriber/consumer was not active
+> * There is an extra step when creating a consumer - `session.createDurableConsumer(uniqueID, consumerName)` and broker knows also that even this specific consumer is not connected (like connection is down), all messages should wait until it is connected and then deliver messages. 
+> * When application closes, we should call session.unsubscribe(consumer) to unregister the subscription.
 </details>
 
+<details>
+<summary>How is durable subscription identified on a broker?</summary>
+
+> * Unique **ClientID** - id of a client (when connection is created... for example application-name-123)
+> * Unique Subscription-/**ConsumerName** - uniquely identifies a consumer in the context of client/connection
+</details>
+
+<details>
+<summary>What does it mean to create subscription and start a subscription? </summary>
+
+> Everything is created so connection, sessions, destination, consumer etc but `Connection` is not yet started. 
+> When connection starts, consumer receives messages... 
+</details>
+
+<details>
+<summary>Does `durableConsumer.close()` removes a durable subscription from broker?</summary>
+
+> Nope. First we need to remove close all subscribers assigned to a durable subscription, and then separately `session.unsubscribe()` the durable subscription.
+> 
+> Actually, we can even create a connection, session and define a durable subscription / consumer with clientID and consumer/subs name (`session.createDurableSubscriber(topic, "myDurableSubscription")`) and then close everything, and durable subscription will be already on broker. All messages from specified topic would wait until our ClientID/SubscriptionName subscription will be active.  
+
+</details>
 
 #### Other
 <details>

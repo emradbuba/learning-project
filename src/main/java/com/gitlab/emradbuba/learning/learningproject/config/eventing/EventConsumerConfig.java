@@ -7,12 +7,16 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSourceSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class EventConsumerConfig {
+
+    private final EventConsumerFactory eventConsumerFactory;
 
     @Value("${eventing.amq.broker.name}")
     private String amqBrokerName;
@@ -40,11 +44,10 @@ public class EventConsumerConfig {
                         .build())
                 .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
                         .messageSourceName(consumerSourceName)
-                        .eventCommunicationModelType(EventCommunicationModelType.VIA_VIRTUAL_TOPIC)
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
                         .build())
                 .build();
 
-        return EventConsumerFactory.createEventConsumer(eventConsumerSettings);
+        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
     }
-
 }

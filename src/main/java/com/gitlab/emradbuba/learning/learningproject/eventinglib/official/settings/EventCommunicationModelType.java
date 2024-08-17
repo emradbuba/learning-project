@@ -1,7 +1,8 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings;
 
+// TODO: This has to be discussed in terms of different brokers
 public enum EventCommunicationModelType {
-    VIA_QUEUE,
-    VIA_TOPIC,
-    VIA_VIRTUAL_TOPIC;
+    AMQ_PEER_TO_PEER,
+    AMQ_PUBLISH_SUBSCRIBE,
+    AMQ_VIRTUAL_TOPIC;
 }

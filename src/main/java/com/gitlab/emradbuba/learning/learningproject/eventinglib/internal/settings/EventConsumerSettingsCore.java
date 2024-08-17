@@ -7,13 +7,13 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Getter
 public class EventConsumerSettingsCore {
 
-    private final String consumerName;
+    private final String uniqueConsumerName;
     private final String brokerName;
     private final String brokerUrl;
     private final String brokerUsername;
@@ -25,7 +25,7 @@ public class EventConsumerSettingsCore {
     public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
         EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
 
-        this.consumerName = trim(eventConsumerSettings.getConsumerName());
+        this.uniqueConsumerName = trim(eventConsumerSettings.getConsumerName());
         this.brokerName = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerName());
         this.brokerUrl = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUrl());
         this.brokerUsername = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUsername());

@@ -1,6 +1,6 @@
-package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq;
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventHandlingEntityLifecycle;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
 @Slf4j
-public class ActiveMQEventProducer implements EventProducer, EventHandlingEntityLifecycle {
+public class ActiveMQEventProducer implements EventProducer, EventingLifecycleEntity {
 
     public static final String AMQ_VIRTUAL_TOPIC_PREFIX = "VirtualTopic.";
     private final EventProducerSettingsCore eventProducerSettingsCore;
@@ -26,7 +26,7 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     }
 
     @Override
-    public void start() {
+    public void startEventingLifecycleEntity() {
         try {
             if (!isRunning) {
                 startProducer();
@@ -64,11 +64,11 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
 
     private Destination createProducerDestination() throws JMSException {
         String destinationName = eventProducerSettingsCore.getDestinationName();
-        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_QUEUE) {
+        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.AMQ_PEER_TO_PEER) {
             log.info("EventProducer '{}': Creating queue '{}'...", producerName, destinationName);
             return session.createQueue(destinationName);
         }
-        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.VIA_TOPIC) {
+        if (eventProducerSettingsCore.getEventCommunicationModelType() == EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE) {
             log.info("EventProducer '{}': Creating topic '{}'...", producerName, destinationName);
             return session.createTopic(destinationName);
         }
@@ -89,7 +89,7 @@ public class ActiveMQEventProducer implements EventProducer, EventHandlingEntity
     }
 
     @Override
-    public void stop() {
+    public void stopEventingLifecycleEntity() {
         log.info("Stopping event producer '{}'...", producerName);
         if (!isRunning) {
             log.info("Producer not running - stopping not necessary");
