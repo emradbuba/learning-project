@@ -3,7 +3,10 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.c
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
 import jakarta.jms.JMSException;
 import jakarta.jms.MessageConsumer;
+import jakarta.jms.Queue;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
 
 @Slf4j
 public class ActiveMqEventConsumerVirtualTopic extends AbstractActiveMQEventConsumer {
@@ -15,9 +18,9 @@ public class ActiveMqEventConsumerVirtualTopic extends AbstractActiveMQEventCons
     @Override
     protected MessageConsumer createMessageConsumer() throws JMSException {
 
-        throw new UnsupportedOperationException("This operation is not yet implemented");
+        //throw new UnsupportedOperationException("This operation is not yet implemented");
 
-        /*
+
         String topicName = eventConsumerSettingsCore.getSourceName();
         String virtualTopicName = AMQ_VIRTUAL_TOPIC_PREFIX + topicName;
         String virtualTopicConsumerQueueName = "Consumer." + uniqueConsumerName + "." + virtualTopicName;
@@ -26,6 +29,6 @@ public class ActiveMqEventConsumerVirtualTopic extends AbstractActiveMQEventCons
 
         Queue virtualTopicConsumerQueue = session.createQueue(virtualTopicConsumerQueueName);
         return session.createConsumer(virtualTopicConsumerQueue);
-        */
+
     }
 }

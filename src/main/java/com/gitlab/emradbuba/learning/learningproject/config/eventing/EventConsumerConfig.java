@@ -32,9 +32,10 @@ public class EventConsumerConfig {
     private String consumerSourceName;
 
     @Bean
-    public EventConsumer amqEventConsumer() {
+    public EventConsumer amqEventConsumer1() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .consumerName(consumerName)
+                .microServiceName("Application1")
+                .consumerName("ChangeEventConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -43,11 +44,54 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
-                        .messageSourceName(consumerSourceName)
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
+                        .messageSourceName("TopicCompanyEvents")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
 
         return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
     }
+
+    @Bean
+    public EventConsumer amqEventConsumer2() {
+        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
+                .microServiceName("Application1")
+                .consumerName("ConsumerB")
+                .eventBrokerSettings(EventBrokerSettings.builder()
+                        .brokerName(amqBrokerName)
+                        .brokerUrl(amqBrokerUrl)
+                        .brokerUsername(amqBrokerUsername)
+                        .brokerPassword(amqBrokerPassword)
+                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
+                        .build())
+                .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
+                        .messageSourceName("TopicCompanyEvents")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
+                        .build())
+                .build();
+
+        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
+    }
+
+    @Bean
+    public EventConsumer amqEventConsumer3() {
+        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
+                .microServiceName("ADS")
+                .consumerName("ConsumerA")
+                .eventBrokerSettings(EventBrokerSettings.builder()
+                        .brokerName(amqBrokerName)
+                        .brokerUrl(amqBrokerUrl)
+                        .brokerUsername(amqBrokerUsername)
+                        .brokerPassword(amqBrokerPassword)
+                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
+                        .build())
+                .eventConsumerSourceSettings(EventConsumerSourceSettings.builder()
+                        .messageSourceName("TopicCompanyEvents")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
+                        .build())
+                .build();
+
+        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
+    }
+
 }

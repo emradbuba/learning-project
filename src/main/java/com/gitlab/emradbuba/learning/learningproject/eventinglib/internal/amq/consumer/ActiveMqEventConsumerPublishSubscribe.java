@@ -17,8 +17,9 @@ public class ActiveMqEventConsumerPublishSubscribe extends AbstractActiveMQEvent
 
         String topicName = eventConsumerSettingsCore.getSourceName();
         Topic topic = session.createTopic(topicName);
-        log.info("EventConsumer '{}': Creating durable consumer to topic '{}'...", uniqueConsumerName, topicName);
+        log.info("EventConsumer '{}|{}': Creating durable consumer to topic '{}'...", microServiceName, uniqueConsumerName, topic.getTopicName());
 
-        return session.createDurableConsumer(topic, uniqueConsumerName);
+        String consumerName = String.format("Consumer_%s_%s_of_%s", microServiceName, uniqueConsumerName, topic.getTopicName());
+        return session.createDurableConsumer(topic, consumerName);
     }
 }

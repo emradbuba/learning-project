@@ -90,6 +90,7 @@ JMS is just a standard. There are also different inplementations of this standar
 > <summary>Point-to-point</summary>
 > 
 > > ![img.png](img.png)
+> * This approach uses a queue to which consumer subscribe and producers produce. It is possible to have more that on consumer, but im such case, only one of them will receive the message
 > * Each message --> one consumer
 > * The receiver can fetch the message whether or not it was running when the client sent the message
 > </details>
@@ -100,7 +101,22 @@ JMS is just a standard. There are also different inplementations of this standar
 > > ![img_1.png](img_1.png)
 > * Each message can have multiple consumers
 > * A client that subscribes to a topic can consume only messages sent after the client has created a subscription, and the consumer must continue to be active in order for it to consume messages
+> * So, using this apporach AMQ when a new consumer is created, creates a queue extra for this consumer which is bound to topic. Each time a producer sends a message, it is copied to all queues
 > </details>
+> <details>
+> <summary>Published / Subscriber</summary>
+>
+> > ![img_1.png](img_1.png)
+> * Each message can have multiple consumers
+> * A client that subscribes to a topic can consume only messages sent after the client has created a subscription, and the consumer must continue to be active in order for it to consume messages
+> </details>
+</details>
+
+<details>
+<summary>How do we use VirtualTopics? </summary>
+
+> We can for example be sure, that each application using same topic has unique consumer name, but each pod of the same application with have the same consumer name.
+> By doing so, when message is sent to vTopic, it will be delivered to each application (each queue), but only one pod of each application will handle it.
 </details>
 
 #### Durability and Sharing

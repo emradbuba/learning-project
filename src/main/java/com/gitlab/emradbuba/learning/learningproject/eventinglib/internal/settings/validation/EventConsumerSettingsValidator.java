@@ -13,6 +13,7 @@ import java.util.Optional;
 public class EventConsumerSettingsValidator {
     public static void validateIncomingSettings(final EventConsumerSettings eventConsumerSettings) {
         validateSettingsNotNull(eventConsumerSettings);
+        validateClientId(eventConsumerSettings);
         validateBrokerName(eventConsumerSettings);
         validateBrokerSettings(eventConsumerSettings);
         validateSourceSettings(eventConsumerSettings);
@@ -22,6 +23,11 @@ public class EventConsumerSettingsValidator {
         if (eventConsumerSettings == null) {
             throw new IllegalStateException("EventConsumerSettings are null - check your configuration");
         }
+    }
+
+    private static void validateClientId(final EventConsumerSettings eventConsumerSettings) {
+        String clientId = eventConsumerSettings.getMicroServiceName();
+        validateIfStringDefined(clientId, "clientId", clientId);
     }
 
     private static void validateBrokerName(final EventConsumerSettings eventConsumerSettings) {

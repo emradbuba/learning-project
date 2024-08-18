@@ -17,8 +17,8 @@ public class ActiveMqEventConsumerPeerToPeer extends AbstractActiveMQEventConsum
     protected MessageConsumer createMessageConsumer() throws JMSException {
 
         String queueName = eventConsumerSettingsCore.getSourceName();
-        log.info("EventConsumer '{}': Creating AMQ message consumer using peer-to-peer queue '{}'...", uniqueConsumerName, queueName);
         Queue queue = session.createQueue(queueName);
+        log.info("EventConsumer '{}': Created AMQ message consumer using peer-to-peer queue '{}'...", uniqueConsumerName, queue.getQueueName());
 
         return session.createConsumer(queue);
     }

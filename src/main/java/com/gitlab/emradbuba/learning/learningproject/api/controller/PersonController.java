@@ -38,8 +38,8 @@ import java.util.UUID;
 @Tag(name = "Person management", description = "This part of API enables to manage persons")
 public class PersonController {
 
-    @Autowired
-    EventProducer eventProducer;
+//    @Autowired
+//    EventProducer eventProducer;
 
     private final PersonService personService;
     private final LPRestResponseDetailsCreator restResponseDetailedInfoCreator;
@@ -56,7 +56,7 @@ public class PersonController {
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
             String randomString = UUID.randomUUID().toString().substring(0, 8);
-            eventProducer.produceMessage(randomString);
+            //eventProducer.produceMessage(randomString);
             LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             Person person = personService.getPerson(personBusinessId);
             LPRestResponse<Person> response = LPRestResponse.<Person>builder()

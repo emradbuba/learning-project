@@ -6,16 +6,17 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventC
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.*;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 
 @Slf4j
 public abstract class AbstractActiveMQEventConsumer implements EventConsumer, EventingLifecycleEntity {
 
-    private static final String CLIENT_ID_PREFIX = "ClientID#";
+    private static final String CLIENT_ID_PREFIX = "Client_";
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String uniqueConsumerName;
+    protected final String microServiceName;
 
     protected Connection connection = null;
     protected Session session = null;
@@ -24,23 +25,28 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected AbstractActiveMQEventConsumer(final EventConsumerSettingsCore eventConsumerSettingsCore) {
         this.eventConsumerSettingsCore = eventConsumerSettingsCore;
         this.uniqueConsumerName = eventConsumerSettingsCore.getUniqueConsumerName();
+        this.microServiceName = eventConsumerSettingsCore.getMicroServiceName();
     }
 
     private void startListening() throws JMSException {
 
         log.info("EventConsumer '{}': Initializing phase...", uniqueConsumerName);
-        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 eventConsumerSettingsCore.getBrokerUrl(),
                 eventConsumerSettingsCore.getBrokerUsername(),
                 eventConsumerSettingsCore.getBrokerPassword()
         );
 
-        final String clientID = createClientID(eventConsumerSettingsCore);
+        final String clientID = CLIENT_ID_PREFIX + microServiceName + "_" + uniqueConsumerName;
 
         log.info("EventConsumer '{}': Creating connection | ClientID='{}'...", uniqueConsumerName, clientID);
         connection = connectionFactory.createConnection();
         connection.setClientID(clientID);
 
+        log.info("EventConsumer '{}': Creating session...", uniqueConsumerName);
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+        consumer = createMessageConsumer();
         log.info("EventConsumer '{}': Adding message and error listeners...", uniqueConsumerName);
         consumer.setMessageListener(message -> {
             // TODO: listener should be separate
@@ -48,7 +54,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
                 try {
                     TextMessage textMessage = (TextMessage) message;
                     String s = textMessage.getText();
-                    log.info("Consuming message: <{}>", s);
+                    log.info("[Consumer <{}>] Consuming message: '{}'", uniqueConsumerName, s);
                     textMessage.acknowledge();
                 } catch (JMSException e) {
                     log.error("Could not read message...");
@@ -60,20 +66,9 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
             log.error("MessageConsumer '{}' could not handle an incoming message: <{}>", uniqueConsumerName, exception.getMessage());
         });
 
-        log.info("EventConsumer '{}': Creating session...", uniqueConsumerName);
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-        consumer = createMessageConsumer();
-
         log.info("EventConsumer '{}': Starting connection ...", uniqueConsumerName);
         connection.start();
         log.info("EventConsumer '{}': STARTED SUCCESSFULLY...", uniqueConsumerName);
-    }
-
-    private String createClientID(EventConsumerSettingsCore eventConsumerSettingsCore) {
-        // TODO: getConsumerName ==> move to properties so user can create a unique name for his/her application...
-        final String consumerNameUpperCase = eventConsumerSettingsCore.getUniqueConsumerName().toUpperCase();
-        return CLIENT_ID_PREFIX + consumerNameUpperCase;
     }
 
     protected abstract MessageConsumer createMessageConsumer() throws JMSException;
