@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer;
+package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class EventConsumerSourceSettings {
-    private final String messageSourceName;
+public class EventDestinationSettings {
+    private final String destinationName;
     private final EventCommunicationModelType eventCommunicationModelType;
 }

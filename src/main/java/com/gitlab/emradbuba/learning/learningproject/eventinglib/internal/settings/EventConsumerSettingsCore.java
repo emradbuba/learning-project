@@ -13,25 +13,25 @@ public class EventConsumerSettingsCore {
 
     private final String microServiceName;
     private final String uniqueConsumerName;
+    private final String eventDestinationName;
     private final String brokerName;
     private final String brokerUrl;
     private final String brokerUsername;
     private final String brokerPassword;
-    private final String sourceName;
     private final EventBrokerType eventBrokerType;
     private final EventCommunicationModelType eventCommunicationModelType;
 
     public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
         EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
 
-        this.microServiceName = trim(eventConsumerSettings.getMicroServiceName());
+        this.microServiceName = trim(eventConsumerSettings.getMicroServiceUniqueName());
         this.uniqueConsumerName = trim(eventConsumerSettings.getConsumerName());
+        this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getDestinationName());
         this.brokerName = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerName());
         this.brokerUrl = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUrl());
         this.brokerUsername = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUsername());
         this.brokerPassword = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerPassword());
         this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
-        this.sourceName = trim(eventConsumerSettings.getEventConsumerSourceSettings().getMessageSourceName());
-        this.eventCommunicationModelType = eventConsumerSettings.getEventConsumerSourceSettings().getEventCommunicationModelType();
+        this.eventCommunicationModelType = eventConsumerSettings.getEventDestinationSettings().getEventCommunicationModelType();
     }
 }

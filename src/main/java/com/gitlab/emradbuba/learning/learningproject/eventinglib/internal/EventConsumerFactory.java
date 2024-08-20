@@ -28,6 +28,6 @@ public final class EventConsumerFactory {
             return amqEventConsumerFactory.createEventConsumer(eventConsumerSettingsCore);
         }
 
-        throw new IllegalStateException("Cannot create an event consumer - unsupported eventBrokerType: " + eventBrokerType);
+        throw new UnsupportedOperationException("Cannot create an event consumer - unsupported eventBrokerType: " + eventBrokerType);
     }
 }

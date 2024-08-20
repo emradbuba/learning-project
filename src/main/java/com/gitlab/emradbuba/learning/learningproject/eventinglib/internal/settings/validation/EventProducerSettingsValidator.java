@@ -3,7 +3,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.setti
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerDestinationSettings;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventDestinationSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.util.UrlUtils;
@@ -55,9 +55,9 @@ public class EventProducerSettingsValidator {
 
     private static void validateDestinationSettings(final EventProducerSettings eventProducerSettings) {
         final String producerName = eventProducerSettings.getProducerName();
-        final EventProducerDestinationSettings destinationSettings = eventProducerSettings.getEventProducerDestinationSettings();
-        final String destinationName = destinationSettings.getMessageDestinationName();
-        final EventCommunicationModelType communicationModel = destinationSettings.getEventCommunicationModelType();
+        final EventDestinationSettings eventDestinationSettings = eventProducerSettings.getEventDestinationSettings();
+        final String destinationName = eventDestinationSettings.getDestinationName();
+        final EventCommunicationModelType communicationModel = eventDestinationSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(destinationName, "destinationName", producerName);
         validateIfCommunicationModelDefined(communicationModel, producerName);

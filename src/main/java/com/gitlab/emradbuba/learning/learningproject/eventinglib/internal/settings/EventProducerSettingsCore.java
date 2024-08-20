@@ -32,11 +32,11 @@ public class EventProducerSettingsCore {
         this.producerName = trim(eventProducerSettings.getProducerName());
         this.destinationName = normalizeDestinationNameAgainstAmqVirtualTopic(eventProducerSettings); // TODO: AMQ-specific part in abstract code!
         this.eventBrokerType = eventProducerSettings.getEventBrokerSettings().getEventBrokerType();
-        this.eventCommunicationModelType = eventProducerSettings.getEventProducerDestinationSettings().getEventCommunicationModelType();
+        this.eventCommunicationModelType = eventProducerSettings.getEventDestinationSettings().getEventCommunicationModelType();
     }
 
     private static String normalizeDestinationNameAgainstAmqVirtualTopic(EventProducerSettings eventProducerSettings) {
-        final String originalName = eventProducerSettings.getEventProducerDestinationSettings().getMessageDestinationName().trim();
+        final String originalName = eventProducerSettings.getEventDestinationSettings().getDestinationName().trim();
         return StringUtils.startsWithIgnoreCase(originalName, AMQ_VIRTUAL_TOPIC_PREFIX)
                 ? originalName.substring(AMQ_VIRTUAL_TOPIC_PREFIX.length())
                 : originalName;

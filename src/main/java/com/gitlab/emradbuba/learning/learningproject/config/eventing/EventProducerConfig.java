@@ -3,11 +3,8 @@ package com.gitlab.emradbuba.learning.learningproject.config.eventing;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.EventProducerFactory;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.*;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerDestinationSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration
 public class EventProducerConfig {
@@ -36,8 +33,8 @@ public class EventProducerConfig {
                         .brokerUsername(amqBrokerUsername)
                         .brokerPassword(amqBrokerPassword)
                         .build())
-                .eventProducerDestinationSettings(EventProducerDestinationSettings.builder()
-                        .messageDestinationName(producerDestinationName)
+                .eventDestinationSettings(EventDestinationSettings.builder()
+                        .destinationName(producerDestinationName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
                         .build())
                 .build();

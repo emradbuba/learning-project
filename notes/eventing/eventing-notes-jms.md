@@ -104,11 +104,13 @@ JMS is just a standard. There are also different inplementations of this standar
 > * So, using this apporach AMQ when a new consumer is created, creates a queue extra for this consumer which is bound to topic. Each time a producer sends a message, it is copied to all queues
 > </details>
 > <details>
-> <summary>Published / Subscriber</summary>
+> <summary>Virtual Topics (AMQ)</summary>
 >
-> > ![img_1.png](img_1.png)
-> * Each message can have multiple consumers
-> * A client that subscribes to a topic can consume only messages sent after the client has created a subscription, and the consumer must continue to be active in order for it to consume messages
+> > ![img_3.png](img_3.png)
+> * Mixes the topics concept with the Queue concept...
+> * Each message is sent to VirtualTopic (not a phisical address on AMQ broker, but some kind of abstraction, recognized my naming convention __"VirtualTopic.*"__.)
+> * Afterwards message is multiplied through all VirtualTopics-assigned Queues, where each queue `Consumer.ConsumerName.VirtualTopic.TopicName` is created for a specific consumer name
+> * Consumers then, when subscribing, subscribe to a specific Queue with consumer name... Even if we have 3 pods, message is consumed only by one (its just a Queue)
 > </details>
 </details>
 

@@ -6,18 +6,20 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventC
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.artemis.jms.client.*;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
+
+import java.util.UUID;
+
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.EventingUtils.CONNECTION_CLIENT_ID_PREFIX;
 
 @Slf4j
 public abstract class AbstractActiveMQEventConsumer implements EventConsumer, EventingLifecycleEntity {
 
-    private static final String CLIENT_ID_PREFIX = "Client_";
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String uniqueConsumerName;
     protected final String microServiceName;
-
     protected Connection connection = null;
     protected Session session = null;
     protected MessageConsumer consumer = null;
@@ -37,16 +39,46 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
                 eventConsumerSettingsCore.getBrokerPassword()
         );
 
-        final String clientID = CLIENT_ID_PREFIX + microServiceName + "_" + uniqueConsumerName;
+        createConnection(createUniqueConnectionClientID(), connectionFactory);
+        createSession();
+        createMessageConsumer();
+        addMessageListener();
+        addErrorListener();
+        startConnection();
 
-        log.info("EventConsumer '{}': Creating connection | ClientID='{}'...", uniqueConsumerName, clientID);
+        log.info("EventConsumer '{}': STARTED SUCCESSFULLY with clientId '{}'...", uniqueConsumerName, connection.getClientID());
+    }
+
+    private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
+        log.info("EventConsumer '{}': Creating connection... | Setting clientID='{}'...", uniqueConsumerName, clientId);
         connection = connectionFactory.createConnection();
-        connection.setClientID(clientID);
+        connection.setClientID(clientId);
+    }
 
-        log.info("EventConsumer '{}': Creating session...", uniqueConsumerName);
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    private String createUniqueConnectionClientID() {
+        final String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+        final String prefixedServiceName = CONNECTION_CLIENT_ID_PREFIX + microServiceName.toUpperCase();
 
-        consumer = createMessageConsumer();
+        return prefixedServiceName + "_" + randomSuffix;
+    }
+
+    private void createSession() throws JMSException {
+        boolean transacted = false;
+        int autoAcknowledge = Session.AUTO_ACKNOWLEDGE;
+        log.info("EventConsumer '{}': Creating session... | Transacted={}, AckMode={}", uniqueConsumerName, transacted, autoAcknowledge);
+        session = connection.createSession(transacted, autoAcknowledge);
+    }
+
+    public abstract void createMessageConsumer() throws JMSException;
+
+    private void addErrorListener() throws JMSException {
+        connection.setExceptionListener(exception -> {
+            // TODO: listener should be separate
+            log.error("MessageConsumer '{}' could not handle an incoming message: <{}>", uniqueConsumerName, exception.getMessage());
+        });
+    }
+
+    private void addMessageListener() throws JMSException {
         log.info("EventConsumer '{}': Adding message and error listeners...", uniqueConsumerName);
         consumer.setMessageListener(message -> {
             // TODO: listener should be separate
@@ -54,24 +86,19 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
                 try {
                     TextMessage textMessage = (TextMessage) message;
                     String s = textMessage.getText();
-                    log.info("[Consumer <{}>] Consuming message: '{}'", uniqueConsumerName, s);
-                    textMessage.acknowledge();
+                    log.info("[Consumer <{}> | Client={}] Consuming message: '{}'", uniqueConsumerName, connection.getClientID(), s);
                 } catch (JMSException e) {
                     log.error("Could not read message...");
+                    // TODO: add some exception to retry the event or put it on DLQ
                 }
             }
         });
-        connection.setExceptionListener(exception -> {
-            // TODO: listener should be separate
-            log.error("MessageConsumer '{}' could not handle an incoming message: <{}>", uniqueConsumerName, exception.getMessage());
-        });
-
-        log.info("EventConsumer '{}': Starting connection ...", uniqueConsumerName);
-        connection.start();
-        log.info("EventConsumer '{}': STARTED SUCCESSFULLY...", uniqueConsumerName);
     }
 
-    protected abstract MessageConsumer createMessageConsumer() throws JMSException;
+    private void startConnection() throws JMSException {
+        log.info("EventConsumer '{}': Starting connection ...", uniqueConsumerName);
+        connection.start();
+    }
 
     @EventListener(ApplicationStartedEvent.class)
     @Override

@@ -4,7 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSourceSettings;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventDestinationSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.util.UrlUtils;
 
@@ -26,7 +26,7 @@ public class EventConsumerSettingsValidator {
     }
 
     private static void validateClientId(final EventConsumerSettings eventConsumerSettings) {
-        String clientId = eventConsumerSettings.getMicroServiceName();
+        String clientId = eventConsumerSettings.getMicroServiceUniqueName();
         validateIfStringDefined(clientId, "clientId", clientId);
     }
 
@@ -60,8 +60,8 @@ public class EventConsumerSettingsValidator {
 
     private static void validateSourceSettings(final EventConsumerSettings eventConsumerSettings) {
         final String consumerName = eventConsumerSettings.getConsumerName();
-        final EventConsumerSourceSettings sourceSettings = eventConsumerSettings.getEventConsumerSourceSettings();
-        final String sourceName = sourceSettings.getMessageSourceName();
+        final EventDestinationSettings sourceSettings = eventConsumerSettings.getEventDestinationSettings();
+        final String sourceName = sourceSettings.getDestinationName();
         final EventCommunicationModelType communicationModel = sourceSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(sourceName, "sourceName", consumerName);
