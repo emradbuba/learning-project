@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EventingService {
 
-    //private final EventProducer eventProducer;
+    private final EventProducer eventProducer;
 
     public void sendMessage(final SendEventMessageCommand sendEventMessageCommand) {
         final String messageTextToSend = String.format(
                 "EventMessage [%s]: '%s'", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
         );
 
-        //eventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
+        eventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
     }
 }

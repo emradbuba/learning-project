@@ -5,8 +5,10 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventP
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.*;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 public class EventProducerConfig {
 
     @Value("${eventing.amq.broker.name}")
@@ -22,7 +24,7 @@ public class EventProducerConfig {
     @Value("${eventing.amq.producer.destinationName}")
     private String producerDestinationName;
 
-    //@Bean
+    @Bean
     public EventProducer amqEventProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
                 .producerName(producerName)
@@ -34,7 +36,7 @@ public class EventProducerConfig {
                         .brokerPassword(amqBrokerPassword)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(producerDestinationName)
+                        .destinationName("RejdiEventsVP")
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
                         .build())
                 .build();
