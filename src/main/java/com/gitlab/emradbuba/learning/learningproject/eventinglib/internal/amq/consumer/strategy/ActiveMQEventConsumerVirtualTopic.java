@@ -6,12 +6,12 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
+import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.EventingUtils.AMQ_VIRTUAL_TOPIC_PREFIX;
 
 @Slf4j
-public class ActiveMqEventConsumerVirtualTopic extends AbstractActiveMQEventConsumer {
+public class ActiveMQEventConsumerVirtualTopic extends AbstractActiveMQEventConsumer {
 
-    public ActiveMqEventConsumerVirtualTopic(EventConsumerSettingsCore eventConsumerSettingsCore) {
+    public ActiveMQEventConsumerVirtualTopic(EventConsumerSettingsCore eventConsumerSettingsCore) {
         super(eventConsumerSettingsCore);
     }
 
@@ -24,9 +24,9 @@ public class ActiveMqEventConsumerVirtualTopic extends AbstractActiveMQEventCons
 
         String pureTopicName = eventConsumerSettingsCore.getEventDestinationName();
         String virtualTopicName = AMQ_VIRTUAL_TOPIC_PREFIX + pureTopicName;
-        String virtualTopicConsumerQueueName = "Consumer." + uniqueConsumerName + "." + virtualTopicName;
+        String virtualTopicConsumerQueueName = "Consumer." + consumerName + "." + virtualTopicName;
 
-        log.info("EventConsumer '{}': Creating consumer connecting to VirtualTopic consuming queue '{}'...", uniqueConsumerName, virtualTopicConsumerQueueName);
+        log.info("EventConsumer '{}': Creating consumer connecting to VirtualTopic consuming queue '{}'...", consumerName, virtualTopicConsumerQueueName);
 
         Queue virtualTopicConsumerQueue = session.createQueue(virtualTopicConsumerQueueName);
         consumer = session.createConsumer(virtualTopicConsumerQueue);

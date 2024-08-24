@@ -7,9 +7,9 @@ import jakarta.jms.Queue;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ActiveConsumerStrategyPeerToPeer extends AbstractActiveMQEventConsumer {
+public class ActiveMQEventConsumerPeerToPeer extends AbstractActiveMQEventConsumer {
 
-    public ActiveConsumerStrategyPeerToPeer(EventConsumerSettingsCore eventConsumerSettingsCore) {
+    public ActiveMQEventConsumerPeerToPeer(EventConsumerSettingsCore eventConsumerSettingsCore) {
         super(eventConsumerSettingsCore);
     }
 
@@ -20,7 +20,7 @@ public class ActiveConsumerStrategyPeerToPeer extends AbstractActiveMQEventConsu
           without any specific subscription name:
         */
         Queue queue = session.createQueue(eventConsumerSettingsCore.getEventDestinationName());
-        log.info("EventConsumer '{}': - creating consumer of the AMQ Queue '{}'...", uniqueConsumerName, queue.getQueueName());
+        log.info("EventConsumer '{}': - creating consumer of the AMQ Queue '{}'...", consumerName, queue.getQueueName());
 
         consumer = session.createConsumer(queue);
     }

@@ -12,7 +12,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
 public class EventConsumerSettingsCore {
 
     private final String microServiceName;
-    private final String uniqueConsumerName;
+    private final String consumerName;
     private final String eventDestinationName;
     private final String brokerName;
     private final String brokerUrl;
@@ -24,14 +24,14 @@ public class EventConsumerSettingsCore {
     public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
         EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
 
-        this.microServiceName = trim(eventConsumerSettings.getMicroServiceUniqueName());
-        this.uniqueConsumerName = trim(eventConsumerSettings.getConsumerName());
-        this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getDestinationName());
         this.brokerName = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerName());
         this.brokerUrl = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUrl());
         this.brokerUsername = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerUsername());
         this.brokerPassword = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerPassword());
         this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
+        this.consumerName = trim(eventConsumerSettings.getConsumerName());
+        this.microServiceName = trim(eventConsumerSettings.getMicroServiceUniqueName());
+        this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getDestinationName());
         this.eventCommunicationModelType = eventConsumerSettings.getEventDestinationSettings().getEventCommunicationModelType();
     }
 }

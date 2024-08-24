@@ -5,15 +5,14 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import lombok.Getter;
-import org.springframework.util.StringUtils;
 
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer.ActiveMQEventProducer.AMQ_VIRTUAL_TOPIC_PREFIX;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Getter
 public class EventProducerSettingsCore {
 
     private final String producerName;
+    private final String microServiceName;
     private final String brokerName;
     private final String brokerUrl;
     private final String brokerUsername;
@@ -29,16 +28,10 @@ public class EventProducerSettingsCore {
         this.brokerUrl = trim(eventProducerSettings.getEventBrokerSettings().getBrokerUrl());
         this.brokerUsername = trim(eventProducerSettings.getEventBrokerSettings().getBrokerUsername());
         this.brokerPassword = trim(eventProducerSettings.getEventBrokerSettings().getBrokerPassword());
-        this.producerName = trim(eventProducerSettings.getProducerName());
-        this.destinationName = normalizeDestinationNameAgainstAmqVirtualTopic(eventProducerSettings); // TODO: AMQ-specific part in abstract code!
         this.eventBrokerType = eventProducerSettings.getEventBrokerSettings().getEventBrokerType();
+        this.producerName = trim(eventProducerSettings.getProducerName());
         this.eventCommunicationModelType = eventProducerSettings.getEventDestinationSettings().getEventCommunicationModelType();
-    }
-
-    private static String normalizeDestinationNameAgainstAmqVirtualTopic(EventProducerSettings eventProducerSettings) {
-        final String originalName = eventProducerSettings.getEventDestinationSettings().getDestinationName().trim();
-        return StringUtils.startsWithIgnoreCase(originalName, AMQ_VIRTUAL_TOPIC_PREFIX)
-                ? originalName.substring(AMQ_VIRTUAL_TOPIC_PREFIX.length())
-                : originalName;
+        this.microServiceName = trim(eventProducerSettings.getMicroServiceName());
+        this.destinationName = trim(eventProducerSettings.getEventDestinationSettings().getDestinationName());
     }
 }

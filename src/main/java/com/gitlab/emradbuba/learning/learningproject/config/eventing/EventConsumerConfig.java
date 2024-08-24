@@ -34,8 +34,8 @@ public class EventConsumerConfig {
     @Bean
     public EventConsumer amqEventConsumer1() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("App1")
-                .consumerName("ChangeEventConsumer")
+                .microServiceUniqueName("LearningApp")
+                .consumerName("UpdatingEventsConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -44,8 +44,8 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("RejdiEventsVP")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
+                        .destinationName("CompanyEventsPeerToPeerQueue")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();
 
@@ -55,8 +55,8 @@ public class EventConsumerConfig {
     @Bean
     public EventConsumer amqEventConsumer2() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("App1")
-                .consumerName("DeleteEventConsumer")
+                .microServiceUniqueName("LearningApp")
+                .consumerName("DeletingEventsConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -65,78 +65,11 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("RejdiEventsVP")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
+                        .destinationName("CompanyEventsPeerToPeerQueue")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();
 
         return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
     }
-
-    @Bean
-    public EventConsumer amqEventConsumer3_POD1() {
-        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("App2")
-                .consumerName("AllEventConsumer")
-                .eventBrokerSettings(EventBrokerSettings.builder()
-                        .brokerName(amqBrokerName)
-                        .brokerUrl(amqBrokerUrl)
-                        .brokerUsername(amqBrokerUsername)
-                        .brokerPassword(amqBrokerPassword)
-                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
-                        .build())
-                .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("RejdiEventsVP")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
-                        .build())
-                .build();
-
-        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
-    }
-
-
-    @Bean
-    public EventConsumer amqEventConsumer3_POD2() {
-        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("App2")
-                .consumerName("AllEventConsumer")
-                .eventBrokerSettings(EventBrokerSettings.builder()
-                        .brokerName(amqBrokerName)
-                        .brokerUrl(amqBrokerUrl)
-                        .brokerUsername(amqBrokerUsername)
-                        .brokerPassword(amqBrokerPassword)
-                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
-                        .build())
-                .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("RejdiEventsVP")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
-                        .build())
-                .build();
-
-        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
-    }
-
-    @Bean
-    public EventConsumer amqEventConsumer3_POD3() {
-        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("App2")
-                .consumerName("AllEventConsumer")
-                .eventBrokerSettings(EventBrokerSettings.builder()
-                        .brokerName(amqBrokerName)
-                        .brokerUrl(amqBrokerUrl)
-                        .brokerUsername(amqBrokerUsername)
-                        .brokerPassword(amqBrokerPassword)
-                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
-                        .build())
-                .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("RejdiEventsVP")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_VIRTUAL_TOPIC)
-                        .build())
-                .build();
-
-        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
-    }
-
-
-
 }

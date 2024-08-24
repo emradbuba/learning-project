@@ -1,20 +1,19 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
-import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRestRequestContextCreator;
-import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponseDetailsCreator;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.person.converter.PostNewPersonRequestToCommandConverter;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.person.converter.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRestRequestContext;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.request.LPRestRequestContextCreator;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponse;
+import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponseDetailsCreator;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
-import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPRestResponse;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.person.AddNewPersonCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.person.UpdateExistingPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.converter.PostNewPersonRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.converter.PutExistingPersonRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.validation.PersonCommandValidator;
 import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,21 +24,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/person")
 @AllArgsConstructor
 @Tag(name = "Person management", description = "This part of API enables to manage persons")
 public class PersonController {
-
-//    @Autowired
-//    EventProducer eventProducer;
 
     private final PersonService personService;
     private final LPRestResponseDetailsCreator restResponseDetailedInfoCreator;
@@ -55,8 +48,6 @@ public class PersonController {
             @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
             @PathVariable("personBusinessId") String personBusinessId) {
         try {
-            String randomString = UUID.randomUUID().toString().substring(0, 8);
-            //eventProducer.produceMessage(randomString);
             LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             Person person = personService.getPerson(personBusinessId);
             LPRestResponse<Person> response = LPRestResponse.<Person>builder()
@@ -97,8 +88,8 @@ public class PersonController {
     @ApiResponse(responseCode = "422", description = "When request cannot be processed due to incorrect input", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LPErrorResponse.class, description = "Standard error response from learning project")))
     @Operation(summary = "Updates an existing person", description = "Updates an existing person with a given businessId with data sent in payload")
     public ResponseEntity<LPRestResponse<Person>> updateExistingPerson(@RequestBody PutExistingPersonRequest putExistingPersonRequest,
-                                                       @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
-                                                       @PathVariable("personBusinessId") String personBusinessId) {
+                                                                       @Parameter(description = "UUID - businessId of a person", required = true, example = "f131dd87-a582-48e1-af07-a083122daa3c")
+                                                                       @PathVariable("personBusinessId") String personBusinessId) {
         try {
             LPRestRequestContext restRequestContext = new LPRestRequestContextCreator().create();
             UpdateExistingPersonCommand updateExistingPersonCommand =
@@ -139,5 +130,6 @@ public class PersonController {
 
     // Workaround for Swagger generic responses...
     // https://stackoverflow.com/a/48643021/1534456
-    static class PersonResponse extends LPRestResponse<Person>{}
+    static class PersonResponse extends LPRestResponse<Person> {
+    }
 }

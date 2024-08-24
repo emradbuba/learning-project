@@ -7,9 +7,9 @@ import jakarta.jms.Topic;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ActiveMqEventConsumerPublishSubscribe extends AbstractActiveMQEventConsumer {
+public class ActiveMQEventConsumerPublishSubscribe extends AbstractActiveMQEventConsumer {
 
-    public ActiveMqEventConsumerPublishSubscribe(EventConsumerSettingsCore eventConsumerSettingsCore) {
+    public ActiveMQEventConsumerPublishSubscribe(EventConsumerSettingsCore eventConsumerSettingsCore) {
         super(eventConsumerSettingsCore);
     }
 
@@ -23,8 +23,8 @@ public class ActiveMqEventConsumerPublishSubscribe extends AbstractActiveMQEvent
         String topicName = eventConsumerSettingsCore.getEventDestinationName();
         Topic topic = session.createTopic(topicName);
 
-        log.info("EventConsumer '{}': Creating durable consumer of topic '{}'...", uniqueConsumerName, topic.getTopicName());
-        String consumerName = String.format("%s_%s_%s", microServiceName, uniqueConsumerName, topic.getTopicName());
+        log.info("EventConsumer '{}': Creating durable consumer of topic '{}'...", consumerName, topic.getTopicName());
+        String consumerName = String.format("%s_%s_%s", microServiceName, this.consumerName, topic.getTopicName());
 
         consumer = session.createDurableConsumer(topic, consumerName);
     }
