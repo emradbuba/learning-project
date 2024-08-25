@@ -7,17 +7,13 @@ import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
-import java.util.UUID;
-
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.EventingUtils.CONSUMER_CONNECTION_CLIENT_ID_PREFIX;
-
 @Slf4j
 public abstract class AbstractActiveMQEventConsumer implements EventConsumer, EventingLifecycleEntity {
 
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String consumerName;
 
-    protected final String microServiceName;
+    protected final String uniqueMicroServiceName;
     protected Connection connection = null;
     protected Session session = null;
     protected MessageConsumer consumer = null;
@@ -25,7 +21,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected AbstractActiveMQEventConsumer(final EventConsumerSettingsCore eventConsumerSettingsCore) {
         this.eventConsumerSettingsCore = eventConsumerSettingsCore;
         this.consumerName = eventConsumerSettingsCore.getConsumerName();
-        this.microServiceName = eventConsumerSettingsCore.getMicroServiceName();
+        this.uniqueMicroServiceName = eventConsumerSettingsCore.getMicroServiceName();
     }
 
     private void startListening() throws JMSException {
@@ -44,7 +40,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         addErrorListener();
         startConnection();
 
-        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), microServiceName, consumerName);
+        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), uniqueMicroServiceName, consumerName);
     }
 
     private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
@@ -54,8 +50,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     }
 
     private String createUniqueConnectionClientID() {
-        final String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-        return CONSUMER_CONNECTION_CLIENT_ID_PREFIX + randomSuffix;
+        return uniqueMicroServiceName + "_" + consumerName;
     }
 
     private void createSession() throws JMSException {
@@ -82,7 +77,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
                 try {
                     TextMessage textMessage = (TextMessage) message;
                     String s = textMessage.getText();
-                    log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] Consuming message: '{}'", connection.getClientID(), microServiceName, consumerName, s);
+                    log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] Consuming message: '{}'", connection.getClientID(), uniqueMicroServiceName, consumerName, s);
                 } catch (JMSException e) {
                     log.error("Could not read message...");
                 }

@@ -31,7 +31,8 @@ public class EventProducerConfig {
     @Bean
     public EventProducer amqStandardEventProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName(producerName)
+                .producerName("producerName")
+                .microServiceName("LearningApp")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -40,8 +41,8 @@ public class EventProducerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("CompanyEventsPeerToPeerQueue")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
+                        .destinationName("CompanyEventsPubSubTopic")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
 

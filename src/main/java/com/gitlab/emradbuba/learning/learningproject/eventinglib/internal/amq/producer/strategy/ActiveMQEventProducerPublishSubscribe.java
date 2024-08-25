@@ -3,7 +3,11 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.p
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer.AbstractActiveMQEventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
 import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.Topic;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ActiveMQEventProducerPublishSubscribe extends AbstractActiveMQEventProducer {
 
     public ActiveMQEventProducerPublishSubscribe(EventProducerSettingsCore eventProducerSettingsCore) {
@@ -12,6 +16,10 @@ public class ActiveMQEventProducerPublishSubscribe extends AbstractActiveMQEvent
 
     @Override
     protected void createMessageProducer() throws JMSException {
-        throw new UnsupportedOperationException("This operation is not yet implemented");
+        Topic topic = session.createTopic(eventProducerSettingsCore.getDestinationName());
+
+        log.info("EventProducer '{}': Creating topic '{}'...", producerName, topic.getTopicName());
+
+        producer = session.createProducer(topic);
     }
 }

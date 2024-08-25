@@ -4,7 +4,7 @@
 ### Basic
 What are basic messaging styles in messaging systems also in AMQ?
 > <details>
-> <summary>Message Queue pattern (Queue)</summary>
+> <summary>Message Queue pattern (Queue / Peer-To-Peer)</summary>
 >
 > * Also called "point to point"
 > * One or many Consumers/Producers binded to the Queue 
@@ -15,9 +15,10 @@ What are basic messaging styles in messaging systems also in AMQ?
 > <details>
 > <summary>Publish-Subscribe pattern (Topic)</summary>
 >
-> * Messages sent to a topic and consumers subsribe to this topic, so many can read
+> * Messages sent to a topic and consumers subscribe to this topic, so many can read
 > * Messages delivered to all subscribers (consumers)
 > * Message can be delivered "live" when consumer is active when message came
+> * We can create a durable subscriber so messages will be stored in topic (actually a specific dedicated queue) until consumer/subscription is available/active again. It takes place as long as subscription is not removed (session.unsubscribe())
 > </details>
 
 ### Extra in AMQ
@@ -27,6 +28,17 @@ What are basic messaging styles in messaging systems also in AMQ?
 * For topics (publish/subscribe)
 * Durable - message is stored - even if everything crashes - until consumer consumes the message
 * NonDurable - message is saved only as long as the connection which creates the message exists...
+</details>
+
+<details>
+<summary>More details about internal durability representation (PubSub approach) /summary>
+
+* In Artemis a **non-durable** subscription to a topic is visible as: 
+  * topic itself available under "Addesses"
+  * a dedicated queue but with a random name - random, because when connection is off, this queue is removed
+* In Artemis a **DURABLE** subscription to a topic, apart from topic, is represented by: 
+  * dedicated queue for durable subscriber with name: `ClientID.SubscriptionName`
+  * In case of my app, for example: `LearningApp_ChangeEventsConsumer.Sub_ChangeEventsTopic`
 </details>
 
 ## Virtual Topics and their Consumers

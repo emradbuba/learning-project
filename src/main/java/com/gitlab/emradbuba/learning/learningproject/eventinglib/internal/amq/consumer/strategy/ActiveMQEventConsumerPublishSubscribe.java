@@ -23,9 +23,19 @@ public class ActiveMQEventConsumerPublishSubscribe extends AbstractActiveMQEvent
         String topicName = eventConsumerSettingsCore.getEventDestinationName();
         Topic topic = session.createTopic(topicName);
 
-        log.info("EventConsumer '{}': Creating durable consumer of topic '{}'...", consumerName, topic.getTopicName());
-        String consumerName = String.format("%s_%s_%s", microServiceName, this.consumerName, topic.getTopicName());
+        final String subscriptionName = "Sub_" + topicName;
 
-        consumer = session.createDurableConsumer(topic, consumerName);
+        log.info("EventConsumer '{}': Creating durable consumer | SubscriptionName: '{}'...", consumerName, subscriptionName);
+
+        /*
+          Consumer will be visible on Artemis broker depending on subscription type:
+            * Durable (our case) - queue will have a name "clientId_subscriptionName"
+            * Non-Durable - queue with random generated name; removed after connection is off
+
+            So for durable subscription we will have a queue:
+                <AppName::ConsumerName.Sub::TopicName>
+         */
+
+        consumer = session.createDurableConsumer(topic, subscriptionName);
     }
 }

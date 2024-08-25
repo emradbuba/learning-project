@@ -44,8 +44,8 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("CompanyEventsPeerToPeerQueue")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
+                        .destinationName("CompanyEventsPubSubTopic")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
 
@@ -65,8 +65,8 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("CompanyEventsPeerToPeerQueue")
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
+                        .destinationName("CompanyEventsPubSubTopic")
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
 

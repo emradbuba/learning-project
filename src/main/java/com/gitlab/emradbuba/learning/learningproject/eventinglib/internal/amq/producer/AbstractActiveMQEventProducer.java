@@ -7,17 +7,13 @@ import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
-import java.util.UUID;
-
-import static com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.EventingUtils.PRODUCER_CONNECTION_CLIENT_ID_PREFIX;
-
 @Slf4j
 public abstract class AbstractActiveMQEventProducer implements EventProducer, EventingLifecycleEntity {
 
     protected final EventProducerSettingsCore eventProducerSettingsCore;
     protected final String producerName;
 
-    protected final String microServiceName;
+    protected final String uniqueMicroServiceName;
     protected Connection connection = null;
     protected Session session = null;
     protected MessageProducer producer = null;
@@ -25,7 +21,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
     protected AbstractActiveMQEventProducer(EventProducerSettingsCore eventProducerSettingsCore) {
         this.producerName = eventProducerSettingsCore.getProducerName();
         this.eventProducerSettingsCore = eventProducerSettingsCore;
-        this.microServiceName = eventProducerSettingsCore.getMicroServiceName();
+        this.uniqueMicroServiceName = eventProducerSettingsCore.getMicroServiceName();
     }
 
     private void startProducer() throws JMSException {
@@ -41,7 +37,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
         createSession();
         createMessageProducer();
         startConnection();
-        log.info("[Client=<{}> | Service=<{}> | Producer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), microServiceName, producerName);
+        log.info("[Client=<{}> | Service=<{}> | Producer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), uniqueMicroServiceName, producerName);
     }
 
     private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
@@ -51,8 +47,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
     }
 
     private String createUniqueConnectionClientID() {
-        final String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-        return PRODUCER_CONNECTION_CLIENT_ID_PREFIX + randomSuffix;
+        return uniqueMicroServiceName + "::" + producerName;
     }
 
     private void createSession() throws JMSException {
