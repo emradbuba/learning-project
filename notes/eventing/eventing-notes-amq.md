@@ -41,6 +41,17 @@ What are basic messaging styles in messaging systems also in AMQ?
   * In case of my app, for example: `LearningApp_ChangeEventsConsumer.Sub_ChangeEventsTopic`
 </details>
 
+## Effects of different approaches
+| Approach | DURABLE                                                                                      | NON-DURABLE | are deleted?
+--- |----------------------------------------------------------------------------------------------|-------------| ---
+| PeerToPeer | There is one queue on 'addresses' (`QueueName`)<br>and queue for each consumer (`QueueName`) | TODO        | TODO
+| PubSub | There is a topic on 'addresses'<br>and queue for each consumer (`ClientID.SubscriptionName`) | TODO        | TODO
+| VirtualTopic | test                                                                                         | TODO        | TODO
+
+> <span style='color:#fa0'>***TODO***</span>
+> 
+> _ // Add screens from Artemis for QUEUES, CONS, PRODS, ADDRS //_ 
+
 ## Virtual Topics and their Consumers
 
 This document provides an overview of how virtual topics work in Apache ActiveMQ, including naming conventions, how the broker identifies virtual topics, and when topics and queues are physically created on the broker.

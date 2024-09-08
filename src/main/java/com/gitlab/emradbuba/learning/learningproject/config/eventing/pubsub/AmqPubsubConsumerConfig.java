@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.config.eventing;
+package com.gitlab.emradbuba.learning.learningproject.config.eventing.pubsub;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.EventConsumerFactory;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class EventConsumerConfig {
+public class AmqPubsubConsumerConfig {
 
     private final EventConsumerFactory eventConsumerFactory;
 
@@ -26,16 +26,20 @@ public class EventConsumerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.consumer.name}")
-    private String consumerName;
-    @Value("${eventing.amq.consumer.sourceName}")
-    private String consumerSourceName;
+    @Value("${eventing.amq.consumer.pubsub.first.name}")
+    private String firstConsumerName;
+    @Value("${eventing.amq.consumer.pubsub.first.source.name}")
+    private String firstConsumerSourceName;
+    @Value("${eventing.amq.consumer.pubsub.second.name}")
+    private String secondConsumerName;
+    @Value("${eventing.amq.consumer.pubsub.second.source.name}")
+    private String secondConsumerSourceName;
 
     @Bean
-    public EventConsumer amqEventConsumer1() {
+    public EventConsumer firstAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
                 .microServiceUniqueName("LearningApp")
-                .consumerName("UpdatingEventsConsumer")
+                .consumerName(firstConsumerName)
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -44,7 +48,7 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("CompanyEventsPubSubTopic")
+                        .destinationName(firstConsumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
@@ -53,10 +57,10 @@ public class EventConsumerConfig {
     }
 
     @Bean
-    public EventConsumer amqEventConsumer2() {
+    public EventConsumer secondAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
                 .microServiceUniqueName("LearningApp")
-                .consumerName("DeletingEventsConsumer")
+                .consumerName(secondConsumerName)
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -65,7 +69,7 @@ public class EventConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName("CompanyEventsPubSubTopic")
+                        .destinationName(secondConsumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();

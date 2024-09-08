@@ -2,20 +2,34 @@ package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.SendEventMessageCommand;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class EventingService {
 
-    private final EventProducer eventProducer;
+    private final EventProducer amqPeerEventProducer;
+    private final EventProducer amqPubsubEventProducer;
 
-    public void sendMessage(final SendEventMessageCommand sendEventMessageCommand) {
+    public EventingService(@Qualifier("amqPeerProducer") EventProducer amqPeerEventProducer,
+                           @Qualifier("amqPubsubProducer") EventProducer amqPubsubEventProducer) {
+        this.amqPeerEventProducer = amqPeerEventProducer;
+        this.amqPubsubEventProducer = amqPubsubEventProducer;
+    }
+
+    public void sendPeerMessage(final SendEventMessageCommand sendEventMessageCommand) {
         final String messageTextToSend = String.format(
-                "<Msg '%s' | '%s'>", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
+                "<PeerMsg '%s' | '%s'>", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
         );
 
-        eventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
+        amqPeerEventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
+    }
+
+    public void sendPubSubMessage(final SendEventMessageCommand sendEventMessageCommand) {
+        final String messageTextToSend = String.format(
+                "<PubSubMsg '%s' | '%s'>", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
+        );
+
+        amqPubsubEventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
     }
 }
