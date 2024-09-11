@@ -8,6 +8,7 @@ import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessageProducer;
 
 @Slf4j
 public class ActiveMQEventProducerPeerToPeer extends AbstractActiveMQEventProducer {
@@ -25,8 +26,8 @@ public class ActiveMQEventProducerPeerToPeer extends AbstractActiveMQEventProduc
 
         log.info("EventProducer '{}': Creating queue '{}'...", producerName, queue.getQueueName());
 
-        producer = session.createProducer(queue);
+        producer = (ActiveMQMessageProducer) session.createProducer(queue);
 
-        // TODO: producers settings, durability, redelivery...
+        // TODO: extra settings, durability, redelivery...
     }
 }

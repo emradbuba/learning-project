@@ -31,7 +31,7 @@ public class EventConsumerSettingsCore {
         this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
         this.consumerName = trim(eventConsumerSettings.getConsumerName());
         this.microServiceName = trim(eventConsumerSettings.getMicroServiceUniqueName());
-        this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getDestinationName());
+        this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getSourceName());
         this.eventCommunicationModelType = eventConsumerSettings.getEventDestinationSettings().getEventCommunicationModelType();
     }
 }

@@ -61,7 +61,7 @@ public class EventConsumerSettingsValidator {
     private static void validateSourceSettings(final EventConsumerSettings eventConsumerSettings) {
         final String consumerName = eventConsumerSettings.getConsumerName();
         final EventDestinationSettings sourceSettings = eventConsumerSettings.getEventDestinationSettings();
-        final String sourceName = sourceSettings.getDestinationName();
+        final String sourceName = sourceSettings.getSourceName();
         final EventCommunicationModelType communicationModel = sourceSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(sourceName, "sourceName", consumerName);

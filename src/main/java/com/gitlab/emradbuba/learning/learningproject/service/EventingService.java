@@ -1,35 +1,44 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.SendEventMessageCommand;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.LearningEventMessageFactory;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.RestApiEventMessageCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class EventingService {
 
     private final EventProducer amqPeerEventProducer;
-    private final EventProducer amqPubsubEventProducer;
+    //private final EventProducer amqPubsubEventProducer;
+    private final LearningEventMessageFactory learningEventMessageFactory;
 
-    public EventingService(@Qualifier("amqPeerProducer") EventProducer amqPeerEventProducer,
-                           @Qualifier("amqPubsubProducer") EventProducer amqPubsubEventProducer) {
+    public EventingService(@Qualifier("amqPeerEventsProducer") EventProducer amqPeerEventProducer,
+                           /*@Qualifier("amqPubsubProducer") EventProducer amqPubsubEventProducer,*/
+                           LearningEventMessageFactory learningEventMessageFactory) {
         this.amqPeerEventProducer = amqPeerEventProducer;
-        this.amqPubsubEventProducer = amqPubsubEventProducer;
+        //this.amqPubsubEventProducer = amqPubsubEventProducer;
+        this.learningEventMessageFactory = learningEventMessageFactory;
     }
 
-    public void sendPeerMessage(final SendEventMessageCommand sendEventMessageCommand) {
-        final String messageTextToSend = String.format(
-                "<PeerMsg '%s' | '%s'>", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
-        );
-
-        amqPeerEventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
+    public void sendPeerMessage(final RestApiEventMessageCommand restApiEventMessageCommand) {
+        // TODO: Should we return sth if message was not sent? Error? Or just log?
+        LearningAppAmqMessage learningAppAmqMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
+        amqPeerEventProducer.sendMessage(learningAppAmqMessage);
     }
 
-    public void sendPubSubMessage(final SendEventMessageCommand sendEventMessageCommand) {
-        final String messageTextToSend = String.format(
-                "<PubSubMsg '%s' | '%s'>", sendEventMessageCommand.getMessageUuid(), sendEventMessageCommand.getMessageText()
-        );
+    public void sendPubSubMessage(final RestApiEventMessageCommand restApiEventMessageCommand) {
 
-        amqPubsubEventProducer.produceMessage(messageTextToSend); // TODO: Should we return sth if message was not sent? Error? Or just log?
+        // TODO: Should we return sth if message was not sent? Error? Or just log?
+        LearningAppAmqMessage learningAppAmqMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
+        //amqPubsubEventProducer.sendMessage(learningAppAmqMessage);
+    }
+
+    public void sendVirtualTopicMessage(RestApiEventMessageCommand restApiEventMessageCommand) {
+
+        throw new UnsupportedOperationException("VirtualTopic feature is not yet supported...");
     }
 }

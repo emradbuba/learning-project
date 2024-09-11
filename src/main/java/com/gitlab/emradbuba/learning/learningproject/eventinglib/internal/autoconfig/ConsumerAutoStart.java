@@ -3,6 +3,7 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.autoc
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
 import jakarta.annotation.PreDestroy;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
@@ -11,14 +12,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@AllArgsConstructor
 @Slf4j
 public class ConsumerAutoStart {
 
     private final List<EventConsumer> eventConsumerBeans;
-
-    public ConsumerAutoStart(List<EventConsumer> eventConsumerBeans) {
-        this.eventConsumerBeans = eventConsumerBeans;
-    }
 
     @EventListener(ApplicationStartedEvent.class)
     private void startConsumerInstances() {

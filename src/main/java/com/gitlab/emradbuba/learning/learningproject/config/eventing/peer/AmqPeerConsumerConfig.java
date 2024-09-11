@@ -26,20 +26,14 @@ public class AmqPeerConsumerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.consumer.peer.first.name}")
-    private String firstConsumerName;
-    @Value("${eventing.amq.consumer.peer.first.source.name}")
-    private String firstConsumerSourceName;
-    @Value("${eventing.amq.consumer.peer.second.name}")
-    private String secondConsumerName;
-    @Value("${eventing.amq.consumer.peer.second.source.name}")
-    private String secondConsumerSourceName;
+    @Value("${eventing.amq.peer.source.name}")
+    private String amqPeerEventSourceName;
 
     @Bean
-    public EventConsumer firstAmqEventPeerToPeerConsumer() {
+    public EventConsumer firstAppCreationAmqEventPeerToPeerConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("LearningApp")
-                .consumerName(firstConsumerName)
+                .microServiceUniqueName("Application1")
+                .consumerName("creationEventsConsumerPeer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -48,7 +42,7 @@ public class AmqPeerConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(firstConsumerSourceName)
+                        .sourceName(amqPeerEventSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();
@@ -57,10 +51,10 @@ public class AmqPeerConsumerConfig {
     }
 
     @Bean
-    public EventConsumer secondAmqEventPeerToPeerConsumer() {
+    public EventConsumer secondAppCreationAmqEventPeerToPeerConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("LearningApp")
-                .consumerName(secondConsumerName)
+                .microServiceUniqueName("Application2")
+                .consumerName("creationEventsConsumerPeer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -69,7 +63,49 @@ public class AmqPeerConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(secondConsumerSourceName)
+                        .sourceName(amqPeerEventSourceName)
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
+                        .build())
+                .build();
+
+        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
+    }
+
+    @Bean
+    public EventConsumer firstAppUpdateAmqEventPeerToPeerConsumer() {
+        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
+                .microServiceUniqueName("Application1")
+                .consumerName("updateEventsConsumerPeer")
+                .eventBrokerSettings(EventBrokerSettings.builder()
+                        .brokerName(amqBrokerName)
+                        .brokerUrl(amqBrokerUrl)
+                        .brokerUsername(amqBrokerUsername)
+                        .brokerPassword(amqBrokerPassword)
+                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
+                        .build())
+                .eventDestinationSettings(EventDestinationSettings.builder()
+                        .sourceName(amqPeerEventSourceName)
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
+                        .build())
+                .build();
+
+        return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
+    }
+
+    @Bean
+    public EventConsumer secondAppUpdateAmqEventPeerToPeerConsumer() {
+        EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
+                .microServiceUniqueName("Application2")
+                .consumerName("updateEventsConsumerPeer")
+                .eventBrokerSettings(EventBrokerSettings.builder()
+                        .brokerName(amqBrokerName)
+                        .brokerUrl(amqBrokerUrl)
+                        .brokerUsername(amqBrokerUsername)
+                        .brokerPassword(amqBrokerPassword)
+                        .eventBrokerType(EventBrokerType.ACTIVE_MQ)
+                        .build())
+                .eventDestinationSettings(EventDestinationSettings.builder()
+                        .sourceName(amqPeerEventSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();

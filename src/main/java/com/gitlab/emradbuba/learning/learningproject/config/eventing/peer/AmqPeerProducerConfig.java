@@ -26,16 +26,16 @@ public class AmqPeerProducerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.producer.peer.name}")
-    private String producerName;
-    @Value("${eventing.amq.producer.peer.destination.name}")
-    private String producerDestinationName;
+    @Value("${eventing.amq.peer.source.name}")
+    private String amqPeerSourceName;
 
-    @Bean(name = "amqPeerProducer")
-    public EventProducer amqPeerProducer() {
+    // Come back here 5: define consumer using listeners
+
+    @Bean(name = "amqPeerEventsProducer")
+    public EventProducer amqPeerEventsProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName(producerName)
-                .microServiceName("LearningApp")
+                .producerName("amqCreationEventsProducerPeer")
+                .microServiceName("ProducerApp")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -44,7 +44,7 @@ public class AmqPeerProducerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(producerDestinationName)
+                        .sourceName(amqPeerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();

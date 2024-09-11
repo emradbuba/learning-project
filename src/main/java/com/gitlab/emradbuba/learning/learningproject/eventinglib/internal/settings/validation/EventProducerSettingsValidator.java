@@ -56,7 +56,7 @@ public class EventProducerSettingsValidator {
     private static void validateDestinationSettings(final EventProducerSettings eventProducerSettings) {
         final String producerName = eventProducerSettings.getProducerName();
         final EventDestinationSettings eventDestinationSettings = eventProducerSettings.getEventDestinationSettings();
-        final String destinationName = eventDestinationSettings.getDestinationName();
+        final String destinationName = eventDestinationSettings.getSourceName();
         final EventCommunicationModelType communicationModel = eventDestinationSettings.getEventCommunicationModelType();
 
         validateIfStringDefined(destinationName, "destinationName", producerName);

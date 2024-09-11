@@ -22,7 +22,10 @@ public enum LPServiceExceptionErrorCode {
     INCORRECT_CERT_DATES_RELATION("cert_dates_relation", "End date must be later than start date"),
     INCORRECT_CERT_COMPANY_EMPTY("cert_company_empty", "Company name cannot be empty"),
 
-    INCORRECT_EVENT_MESSAGE_TEXT("eventing_empty_message", "Event message text cannot be blank");
+    INCORRECT_REST_MESSAGE_ID("rest_eventing_incorrect_message_id", "Event messageId has to be a valid UUID"),
+    INCORRECT_REST_EVENT_MESSAGE_TEXT("rest_eventing_empty_message", "Event message text cannot be blank"),
+    INCORRECT_REST_EVENT_MESSAGE_REQUESTER("rest_eventing_incorrect_requester", "Event message requester must be defined"),
+    INCORRECT_REST_MESSAGE_TYPE("rest_eventing_incorrect_msgtype", "Event message type must be defined");
 
     private final String reasonCode;
     private final String description;

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class AmqPubsubConsumerConfig {
 
@@ -48,7 +48,7 @@ public class AmqPubsubConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(firstConsumerSourceName)
+                        .sourceName(firstConsumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
@@ -69,7 +69,7 @@ public class AmqPubsubConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .destinationName(secondConsumerSourceName)
+                        .sourceName(secondConsumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();

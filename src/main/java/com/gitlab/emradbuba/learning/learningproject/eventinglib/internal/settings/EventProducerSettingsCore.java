@@ -32,6 +32,6 @@ public class EventProducerSettingsCore {
         this.producerName = trim(eventProducerSettings.getProducerName());
         this.eventCommunicationModelType = eventProducerSettings.getEventDestinationSettings().getEventCommunicationModelType();
         this.microServiceName = trim(eventProducerSettings.getMicroServiceName());
-        this.destinationName = trim(eventProducerSettings.getEventDestinationSettings().getDestinationName());
+        this.destinationName = trim(eventProducerSettings.getEventDestinationSettings().getSourceName());
     }
 }

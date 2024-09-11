@@ -6,6 +6,7 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.Topic;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessageProducer;
 
 @Slf4j
 public class ActiveMQEventProducerPublishSubscribe extends AbstractActiveMQEventProducer {
@@ -20,6 +21,6 @@ public class ActiveMQEventProducerPublishSubscribe extends AbstractActiveMQEvent
 
         log.info("EventProducer '{}': Creating topic '{}'...", producerName, topic.getTopicName());
 
-        producer = session.createProducer(topic);
+        producer = (ActiveMQMessageProducer) session.createProducer(topic);
     }
 }

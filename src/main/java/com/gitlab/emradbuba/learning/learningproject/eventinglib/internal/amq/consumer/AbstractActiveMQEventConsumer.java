@@ -1,11 +1,14 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.consumer;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message.ActiveMQMessageConverter;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 
 @Slf4j
 public abstract class AbstractActiveMQEventConsumer implements EventConsumer, EventingLifecycleEntity {
@@ -73,11 +76,17 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         log.info("EventConsumer '{}': Adding message and error listeners...", consumerName);
         consumer.setMessageListener(message -> {
             // TODO: listener should be separate
-            if (message instanceof TextMessage) {
+            if (message instanceof ActiveMQTextMessage activeMQTextMessage) {
                 try {
-                    TextMessage textMessage = (TextMessage) message;
-                    String s = textMessage.getText();
-                    log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] Consuming message: '{}'", connection.getClientID(), uniqueMicroServiceName, consumerName, s);
+                    LearningAppAmqMessage learningAppAmqMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
+                    log.info("ReceivedMessage! {}->{} | {} | {} '{}' (trigger: {})",
+                            connection.getClientID(),
+                            uniqueMicroServiceName,
+                            consumerName,
+                            learningAppAmqMessage.getMessageId(),
+                            learningAppAmqMessage.getMessageContent(),
+                            learningAppAmqMessage.getMessageTrigger()
+                    );
                 } catch (JMSException e) {
                     log.error("Could not read message...");
                 }

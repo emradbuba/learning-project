@@ -1,11 +1,15 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message.ActiveMQMessageConverter;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventProducerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.*;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 public abstract class AbstractActiveMQEventProducer implements EventProducer, EventingLifecycleEntity {
@@ -14,9 +18,9 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
     protected final String producerName;
 
     protected final String uniqueMicroServiceName;
-    protected Connection connection = null;
-    protected Session session = null;
-    protected MessageProducer producer = null;
+    protected ActiveMQConnection connection = null;
+    protected ActiveMQSession session = null;
+    protected ActiveMQMessageProducer producer = null;
 
     protected AbstractActiveMQEventProducer(EventProducerSettingsCore eventProducerSettingsCore) {
         this.producerName = eventProducerSettingsCore.getProducerName();
@@ -42,7 +46,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
 
     private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
         log.info("EventProducer '{}': Creating connection... | Setting clientID='{}'...", producerName, clientId);
-        connection = connectionFactory.createConnection();
+        connection = (ActiveMQConnection) connectionFactory.createConnection();
         connection.setClientID(clientId);
     }
 
@@ -54,19 +58,24 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
         boolean transacted = false;
         int autoAcknowledge = Session.AUTO_ACKNOWLEDGE;
         log.info("EventProducer '{}': Creating session... | Transacted={}, AckMode={}", producerName, transacted, autoAcknowledge);
-        session = connection.createSession(transacted, autoAcknowledge);
+        session = (ActiveMQSession) connection.createSession(transacted, autoAcknowledge);
     }
 
     protected abstract void createMessageProducer() throws JMSException;
 
     @Override
-    public void produceMessage(String text) {
+    public void sendMessage(LearningAppAmqMessage learningAppAmqMessage) {
+
         try {
-            TextMessage textMessage = session.createTextMessage(text);
-            producer.send(textMessage);
-            log.info("EventProducer '{}': Message sent (bytes={})", producerName, text.getBytes().length);
+            learningAppAmqMessage.setSentDateTime(LocalDateTime.now());
+            ActiveMQTextMessage activeMQTextMessage = ActiveMQMessageConverter.toActiveMQMessage(learningAppAmqMessage, session);
+
+            producer.send(activeMQTextMessage);
+
+            log.info("[EventProducer '{}'] Message sent: (ID={})\n\t(bytes={})\n\t(trigger={})", producerName, learningAppAmqMessage.getMessageId(), learningAppAmqMessage.getMessageContent().getBytes().length, learningAppAmqMessage.getMessageTrigger());
+
         } catch (JMSException e) {
-            log.error(String.format("EventProducer '%s': Could not send message", producerName), e);
+            log.error(String.format("[EventProducer '%s']: Could not send message %s", producerName, learningAppAmqMessage.getMessageId()), e);
         }
     }
 
@@ -104,5 +113,9 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
         } catch (JMSException e) {
             log.error("EventProducer '{}': Cleanup finished with errors - verify the environment...", producerName);
         }
+    }
+
+    private TextMessage createAmqMessage(LearningAppAmqMessage learningAppAmqMessage) {
+        return null;
     }
 }
