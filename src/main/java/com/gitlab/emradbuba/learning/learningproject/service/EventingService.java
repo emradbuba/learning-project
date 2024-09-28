@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.LearningEventMessageFactory;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.RestApiEventMessageCommand;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +25,16 @@ public class EventingService {
     }
 
     public void sendPeerMessage(final RestApiEventMessageCommand restApiEventMessageCommand) {
-        // TODO: Should we return sth if message was not sent? Error? Or just log?
-        LearningAppAmqMessage learningAppAmqMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
-        amqPeerEventProducer.sendMessage(learningAppAmqMessage);
+
+        LearningAppMessage learningAppMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
+
+        amqPeerEventProducer.sendMessage(learningAppMessage);
     }
 
     public void sendPubSubMessage(final RestApiEventMessageCommand restApiEventMessageCommand) {
 
         // TODO: Should we return sth if message was not sent? Error? Or just log?
-        LearningAppAmqMessage learningAppAmqMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
+        LearningAppMessage learningAppMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
         //amqPubsubEventProducer.sendMessage(learningAppAmqMessage);
     }
 

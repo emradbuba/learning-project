@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class EventConsumerSettings {
-    private final String microServiceUniqueName;
+    private final String microServiceName;
     private final String consumerName;
     private final EventBrokerSettings eventBrokerSettings;
     private final EventDestinationSettings eventDestinationSettings;

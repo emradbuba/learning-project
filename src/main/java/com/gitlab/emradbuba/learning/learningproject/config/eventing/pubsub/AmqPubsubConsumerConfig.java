@@ -10,7 +10,6 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class AmqPubsubConsumerConfig {
     @Bean
     public EventConsumer firstAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("LearningApp")
+                .microServiceName("LearningApp")
                 .consumerName(firstConsumerName)
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
@@ -59,7 +58,7 @@ public class AmqPubsubConsumerConfig {
     @Bean
     public EventConsumer secondAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceUniqueName("LearningApp")
+                .microServiceName("LearningApp")
                 .consumerName(secondConsumerName)
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)

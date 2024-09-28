@@ -34,8 +34,8 @@ public class AmqPeerProducerConfig {
     @Bean(name = "amqPeerEventsProducer")
     public EventProducer amqPeerEventsProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName("amqCreationEventsProducerPeer")
-                .microServiceName("ProducerApp")
+                .producerName("amqEventsProducerPeer")
+                .microServiceName("LearningApplication")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)

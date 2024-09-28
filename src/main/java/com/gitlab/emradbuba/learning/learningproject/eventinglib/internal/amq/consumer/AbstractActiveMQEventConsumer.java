@@ -4,7 +4,7 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.me
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
@@ -16,7 +16,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String consumerName;
 
-    protected final String uniqueMicroServiceName;
+    protected final String microServiceName;
     protected Connection connection = null;
     protected Session session = null;
     protected MessageConsumer consumer = null;
@@ -24,7 +24,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected AbstractActiveMQEventConsumer(final EventConsumerSettingsCore eventConsumerSettingsCore) {
         this.eventConsumerSettingsCore = eventConsumerSettingsCore;
         this.consumerName = eventConsumerSettingsCore.getConsumerName();
-        this.uniqueMicroServiceName = eventConsumerSettingsCore.getMicroServiceName();
+        this.microServiceName = eventConsumerSettingsCore.getMicroServiceName();
     }
 
     private void startListening() throws JMSException {
@@ -43,7 +43,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         addErrorListener();
         startConnection();
 
-        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), uniqueMicroServiceName, consumerName);
+        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), microServiceName, consumerName);
     }
 
     private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
@@ -53,7 +53,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     }
 
     private String createUniqueConnectionClientID() {
-        return uniqueMicroServiceName + "_" + consumerName;
+        return microServiceName + "_" + consumerName;
     }
 
     private void createSession() throws JMSException {
@@ -75,21 +75,18 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     private void addMessageListener() throws JMSException {
         log.info("EventConsumer '{}': Adding message and error listeners...", consumerName);
         consumer.setMessageListener(message -> {
-            // TODO: listener should be separate
             if (message instanceof ActiveMQTextMessage activeMQTextMessage) {
-                try {
-                    LearningAppAmqMessage learningAppAmqMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
-                    log.info("ReceivedMessage! {}->{} | {} | {} '{}' (trigger: {})",
-                            connection.getClientID(),
-                            uniqueMicroServiceName,
-                            consumerName,
-                            learningAppAmqMessage.getMessageId(),
-                            learningAppAmqMessage.getMessageContent(),
-                            learningAppAmqMessage.getMessageTrigger()
-                    );
-                } catch (JMSException e) {
-                    log.error("Could not read message...");
-                }
+                LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
+                log.info("\nConsumer '{}/{}' receivedMessage\n\t ID: {} \n\t Text: {}\n\t Type: {}\n\t Trigger: {}\n\t Sender: {}\n\t SenderApp: {} \n\t Created: {}",
+                        microServiceName, consumerName,
+                        incomingLearningAppMessage.getMessageId(),
+                        incomingLearningAppMessage.getMessageContent(),
+                        incomingLearningAppMessage.getMessageType(),
+                        incomingLearningAppMessage.getMessageTrigger(),
+                        incomingLearningAppMessage.getMessageSender(),
+                        incomingLearningAppMessage.getMessageSenderApp(),
+                        incomingLearningAppMessage.getCreatedDateTime().toString()
+                );
             }
         });
     }

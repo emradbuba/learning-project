@@ -26,7 +26,7 @@ public class EventConsumerSettingsValidator {
     }
 
     private static void validateClientId(final EventConsumerSettings eventConsumerSettings) {
-        String clientId = eventConsumerSettings.getMicroServiceUniqueName();
+        String clientId = eventConsumerSettings.getMicroServiceName();
         validateIfStringDefined(clientId, "clientId", clientId);
     }
 

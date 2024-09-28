@@ -1,6 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.service.commands.eventing;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppAmqMessage;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -11,23 +11,23 @@ import java.util.UUID;
 @Component
 public class LearningEventMessageFactory {
 
-    public LearningAppAmqMessage fromRestCommand(RestApiEventMessageCommand restApiEventMessageCommand) {
+    public LearningAppMessage fromRestCommand(RestApiEventMessageCommand restApiEventMessageCommand) {
 
-        final String messageId = Optional.ofNullable(restApiEventMessageCommand.getMessageId())
+        final String newOrExistingMessageId = Optional.ofNullable(restApiEventMessageCommand.getMessageId())
                 .filter(StringUtils::isNoneBlank)
+                .map(String::strip)
                 .orElse(UUID.randomUUID().toString());
 
         // TODO: How to create message so some fields are accessible by client and some for example by other class
         //  responsible for filling final fields and sending... (only)
-        return LearningAppAmqMessage.builder()
-                .messageId(messageId)
+        return LearningAppMessage.builder()
+                .messageId(newOrExistingMessageId)
                 .messageContent(restApiEventMessageCommand.getMessageContent())
                 .messageType(restApiEventMessageCommand.getMessageType().getStandardMessageTypeName())
                 .messageTrigger(restApiEventMessageCommand.getEndpoint())
-                .messageSendingUser(restApiEventMessageCommand.getEndpointRequester())
-                .messageSendingApplication("LearningProject(API)")
+                .messageSender(restApiEventMessageCommand.getEndpointRequester())
+                .messageSenderApp("LearningProject(API)")
                 .createdDateTime(LocalDateTime.now())
-                .sentDateTime(LocalDateTime.now()) // this date is irrelevant - even if defined should be overridden by producer before sending...
                 .build();
     }
 }

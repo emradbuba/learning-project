@@ -2,8 +2,9 @@ package com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.
 
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.eventing.PostEventMessageRequest;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.RestApiEventMessageCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.NormalizationUtils;
 import org.springframework.stereotype.Component;
+
+import static org.apache.commons.lang3.StringUtils.strip;
 
 @Component
 public class RestApiEventRequestToCommandConverter {
@@ -14,9 +15,9 @@ public class RestApiEventRequestToCommandConverter {
         final String endpoint = getCalledEndpointFromRequest();
 
         return RestApiEventMessageCommand.builder()
-                .messageId(postEventMessageRequest.getMessageId())
-                .messageContent(NormalizationUtils.normalizeString(postEventMessageRequest.getMessageContent()))
+                .messageId(strip(postEventMessageRequest.getMessageId()))
                 .messageType(postEventMessageRequest.getMessageType())
+                .messageContent(strip(postEventMessageRequest.getMessageContent()))
                 .endpoint(endpoint)
                 .endpointRequester(requester)
                 .build();

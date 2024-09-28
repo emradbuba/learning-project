@@ -30,7 +30,7 @@ public class EventConsumerSettingsCore {
         this.brokerPassword = trim(eventConsumerSettings.getEventBrokerSettings().getBrokerPassword());
         this.eventBrokerType = eventConsumerSettings.getEventBrokerSettings().getEventBrokerType();
         this.consumerName = trim(eventConsumerSettings.getConsumerName());
-        this.microServiceName = trim(eventConsumerSettings.getMicroServiceUniqueName());
+        this.microServiceName = trim(eventConsumerSettings.getMicroServiceName());
         this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getSourceName());
         this.eventCommunicationModelType = eventConsumerSettings.getEventDestinationSettings().getEventCommunicationModelType();
     }

@@ -8,17 +8,13 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-public class LearningAppAmqMessage {
+public class LearningAppMessage {
 
+    private String messageId;
     private final String messageContent;
     private final String messageType;
     private final String messageTrigger;
-    private final String messageSendingUser;
-    private final String messageSendingApplication;
+    private final String messageSender;
+    private final String messageSenderApp;
     private final LocalDateTime createdDateTime;
-
-    @Setter
-    private LocalDateTime sentDateTime;
-    @Setter
-    private String messageId;
 }
