@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.consumer;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.LoggingEventUtils;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message.ActiveMQMessageConverter;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
@@ -15,8 +16,8 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
 
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String consumerName;
+    protected final String applicationName;
 
-    protected final String microServiceName;
     protected Connection connection = null;
     protected Session session = null;
     protected MessageConsumer consumer = null;
@@ -24,7 +25,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected AbstractActiveMQEventConsumer(final EventConsumerSettingsCore eventConsumerSettingsCore) {
         this.eventConsumerSettingsCore = eventConsumerSettingsCore;
         this.consumerName = eventConsumerSettingsCore.getConsumerName();
-        this.microServiceName = eventConsumerSettingsCore.getMicroServiceName();
+        this.applicationName = eventConsumerSettingsCore.getMicroServiceName();
     }
 
     private void startListening() throws JMSException {
@@ -43,7 +44,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         addErrorListener();
         startConnection();
 
-        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), microServiceName, consumerName);
+        log.info("[Client=<{}> | Service=<{}> | Consumer <{}>] STARTED SUCCESSFULLY :-)", connection.getClientID(), applicationName, consumerName);
     }
 
     private void createConnection(String clientId, ActiveMQConnectionFactory connectionFactory) throws JMSException {
@@ -53,7 +54,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     }
 
     private String createUniqueConnectionClientID() {
-        return microServiceName + "_" + consumerName;
+        return applicationName + "_" + consumerName;
     }
 
     private void createSession() throws JMSException {
@@ -77,16 +78,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         consumer.setMessageListener(message -> {
             if (message instanceof ActiveMQTextMessage activeMQTextMessage) {
                 LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
-                log.info("\nConsumer '{}/{}' receivedMessage\n\t ID: {} \n\t Text: {}\n\t Type: {}\n\t Trigger: {}\n\t Sender: {}\n\t SenderApp: {} \n\t Created: {}",
-                        microServiceName, consumerName,
-                        incomingLearningAppMessage.getMessageId(),
-                        incomingLearningAppMessage.getMessageContent(),
-                        incomingLearningAppMessage.getMessageType(),
-                        incomingLearningAppMessage.getMessageTrigger(),
-                        incomingLearningAppMessage.getMessageSender(),
-                        incomingLearningAppMessage.getMessageSenderApp(),
-                        incomingLearningAppMessage.getCreatedDateTime().toString()
-                );
+                LoggingEventUtils.logIncomingEvent(this, incomingLearningAppMessage);
             }
         });
     }
@@ -126,5 +118,15 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         } catch (JMSException e) {
             log.error("EventConsumer '{}': Cleanup finished with errors - verify the environment...", consumerName);
         }
+    }
+
+    @Override
+    public String getName() {
+        return consumerName;
+    }
+
+    @Override
+    public String getApplicationName() {
+        return applicationName;
     }
 }

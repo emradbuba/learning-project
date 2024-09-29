@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.producer;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.LoggingEventUtils;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message.ActiveMQMessageConverter;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
@@ -9,15 +10,13 @@ import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.*;
 
-import java.time.LocalDateTime;
-
 @Slf4j
 public abstract class AbstractActiveMQEventProducer implements EventProducer, EventingLifecycleEntity {
 
     protected final EventProducerSettingsCore eventProducerSettingsCore;
     protected final String producerName;
 
-    protected final String microServiceName;
+    protected final String applicationName;
     protected ActiveMQConnection connection = null;
     protected ActiveMQSession session = null;
     protected ActiveMQMessageProducer producer = null;
@@ -25,7 +24,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
     protected AbstractActiveMQEventProducer(EventProducerSettingsCore eventProducerSettingsCore) {
         this.producerName = eventProducerSettingsCore.getProducerName();
         this.eventProducerSettingsCore = eventProducerSettingsCore;
-        this.microServiceName = eventProducerSettingsCore.getMicroServiceName();
+        this.applicationName = eventProducerSettingsCore.getMicroServiceName();
     }
 
     private void startProducer() throws JMSException {
@@ -43,7 +42,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
         startConnection();
         log.info("PRODUCER STARTED [Client=<{}> | Service=<{}> | Producer <{}>] STARTED SUCCESSFULLY :-)",
                 connection.getClientID(),
-                microServiceName,
+                applicationName,
                 producerName
         );
     }
@@ -55,7 +54,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
     }
 
     private String createUniqueConnectionClientID() {
-        return microServiceName + "::" + producerName;
+        return applicationName + "::" + producerName;
     }
 
     private void createSession() throws JMSException {
@@ -75,8 +74,7 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
 
             producer.send(activeMQTextMessage);
 
-            log.info("\n[EventProducer '{}'] Message sent" + "\n (ID={})" + "\n (bytes={})",
-                    producerName, learningAppMessage.getMessageId(), learningAppMessage.getMessageContent().getBytes().length);
+            LoggingEventUtils.logOutcomingEvent(this, learningAppMessage); // workaround - normally logging would be AMQ-specific
 
         } catch (JMSException e) {
             log.error(String.format("[EventProducer '%s']: Could not send message %s", producerName, learningAppMessage.getMessageId()), e);
@@ -119,7 +117,13 @@ public abstract class AbstractActiveMQEventProducer implements EventProducer, Ev
         }
     }
 
-    private TextMessage createAmqMessage(LearningAppMessage learningAppMessage) {
-        return null;
+    @Override
+    public String getName() {
+        return producerName;
+    }
+
+    @Override
+    public String getApplicationName() {
+        return applicationName;
     }
 }

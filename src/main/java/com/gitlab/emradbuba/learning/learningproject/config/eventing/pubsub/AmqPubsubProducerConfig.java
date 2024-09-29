@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class AmqPubsubProducerConfig {
 
@@ -26,16 +26,14 @@ public class AmqPubsubProducerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.producer.pubsub.name}")
-    private String producerName;
-    @Value("${eventing.amq.producer.pubsub.destination.name}")
-    private String producerDestinationName;
+    @Value("${eventing.amq.pubsub.source.name}")
+    private String producerSourceName;
 
-    @Bean(name = "amqPubsubProducer")
-    public EventProducer amqPeerProducer() {
+    @Bean(name = "restAmqPubsubEventsProducer")
+    public EventProducer amqPubSubProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName(producerName)
-                .microServiceName("LearningApp")
+                .producerName("restPubSubProducer")
+                .microServiceName("FakeRestApplication")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -44,7 +42,7 @@ public class AmqPubsubProducerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .sourceName(producerDestinationName)
+                        .sourceName(producerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();

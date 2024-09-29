@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service;
 public class EventingService {
 
     private final EventProducer amqPeerEventProducer;
-    //private final EventProducer amqPubsubEventProducer;
+    private final EventProducer amqPubsubEventProducer;
     private final LearningEventMessageFactory learningEventMessageFactory;
 
-    public EventingService(@Qualifier("amqPeerEventsProducer") EventProducer amqPeerEventProducer,
-                           /*@Qualifier("amqPubsubProducer") EventProducer amqPubsubEventProducer,*/
+    public EventingService(@Qualifier("restAmqPeerEventsProducer") EventProducer amqPeerEventProducer,
+                           @Qualifier("restAmqPubsubEventsProducer") EventProducer amqPubsubEventProducer,
                            LearningEventMessageFactory learningEventMessageFactory) {
         this.amqPeerEventProducer = amqPeerEventProducer;
-        //this.amqPubsubEventProducer = amqPubsubEventProducer;
+        this.amqPubsubEventProducer = amqPubsubEventProducer;
         this.learningEventMessageFactory = learningEventMessageFactory;
     }
 
@@ -33,9 +33,9 @@ public class EventingService {
 
     public void sendPubSubMessage(final RestApiEventMessageCommand restApiEventMessageCommand) {
 
-        // TODO: Should we return sth if message was not sent? Error? Or just log?
         LearningAppMessage learningAppMessage = learningEventMessageFactory.fromRestCommand(restApiEventMessageCommand);
-        //amqPubsubEventProducer.sendMessage(learningAppAmqMessage);
+
+        amqPubsubEventProducer.sendMessage(learningAppMessage);
     }
 
     public void sendVirtualTopicMessage(RestApiEventMessageCommand restApiEventMessageCommand) {

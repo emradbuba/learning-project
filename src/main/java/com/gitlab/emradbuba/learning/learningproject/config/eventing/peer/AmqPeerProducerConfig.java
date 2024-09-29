@@ -31,11 +31,11 @@ public class AmqPeerProducerConfig {
 
     // Come back here 5: define consumer using listeners
 
-    @Bean(name = "amqPeerEventsProducer")
+    @Bean(name = "restAmqPeerEventsProducer")
     public EventProducer amqPeerEventsProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName("amqEventsProducerPeer")
-                .microServiceName("LearningApplication")
+                .producerName("restPeerProducer")
+                .microServiceName("FakeRestApplication")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)

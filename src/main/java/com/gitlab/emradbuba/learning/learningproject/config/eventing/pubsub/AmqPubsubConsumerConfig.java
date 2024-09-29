@@ -10,8 +10,9 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class AmqPubsubConsumerConfig {
 
@@ -25,20 +26,14 @@ public class AmqPubsubConsumerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.consumer.pubsub.first.name}")
-    private String firstConsumerName;
-    @Value("${eventing.amq.consumer.pubsub.first.source.name}")
-    private String firstConsumerSourceName;
-    @Value("${eventing.amq.consumer.pubsub.second.name}")
-    private String secondConsumerName;
-    @Value("${eventing.amq.consumer.pubsub.second.source.name}")
-    private String secondConsumerSourceName;
+    @Value("${eventing.amq.pubsub.source.name}")
+    private String consumerSourceName;
 
     @Bean
     public EventConsumer firstAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceName("LearningApp")
-                .consumerName(firstConsumerName)
+                .microServiceName("FakeConsumerApp1")
+                .consumerName("PubSubConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -47,7 +42,7 @@ public class AmqPubsubConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .sourceName(firstConsumerSourceName)
+                        .sourceName(consumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();
@@ -58,8 +53,8 @@ public class AmqPubsubConsumerConfig {
     @Bean
     public EventConsumer secondAmqEventPubsubConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceName("LearningApp")
-                .consumerName(secondConsumerName)
+                .microServiceName("FakeConsumerApp2")
+                .consumerName("PubSubConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -68,7 +63,7 @@ public class AmqPubsubConsumerConfig {
                         .eventBrokerType(EventBrokerType.ACTIVE_MQ)
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
-                        .sourceName(secondConsumerSourceName)
+                        .sourceName(consumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
                 .build();

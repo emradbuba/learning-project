@@ -30,10 +30,10 @@ public class AmqPeerConsumerConfig {
     private String amqPeerEventSourceName;
 
     @Bean
-    public EventConsumer firstAppCreationAmqEventPeerToPeerConsumer() {
+    public EventConsumer firstAppEventPeerToPeerConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceName("ConsumerApp1")
-                .consumerName("eventsConsumerPeer1")
+                .microServiceName("FakeConsumerApp1")
+                .consumerName("PeerConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -51,10 +51,10 @@ public class AmqPeerConsumerConfig {
     }
 
     @Bean
-    public EventConsumer secondAppCreationAmqEventPeerToPeerConsumer() {
+    public EventConsumer secondAppEventPeerToPeerConsumer() {
         EventConsumerSettings eventConsumerSettings = EventConsumerSettings.builder()
-                .microServiceName("ConsumerApp2")
-                .consumerName("eventsConsumerPeer2")
+                .microServiceName("FakeConsumerApp2")
+                .consumerName("PeerConsumer")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
