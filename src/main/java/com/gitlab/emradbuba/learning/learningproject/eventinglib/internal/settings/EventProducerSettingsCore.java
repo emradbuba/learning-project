@@ -31,7 +31,7 @@ public class EventProducerSettingsCore {
         this.eventBrokerType = eventProducerSettings.getEventBrokerSettings().getEventBrokerType();
         this.producerName = trim(eventProducerSettings.getProducerName());
         this.eventCommunicationModelType = eventProducerSettings.getEventDestinationSettings().getEventCommunicationModelType();
-        this.microServiceName = trim(eventProducerSettings.getMicroServiceName());
+        this.microServiceName = trim(eventProducerSettings.getApplicationName());
         this.destinationName = trim(eventProducerSettings.getEventDestinationSettings().getSourceName());
     }
 }

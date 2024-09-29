@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.config.eventing.pubsub;
+package com.gitlab.emradbuba.learning.learningproject.config.eventing.scheduler;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.EventProducerFactory;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
@@ -9,12 +9,14 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settin
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.producer.EventProducerSettings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(value = "eventing.scheduled.producer.enabled", matchIfMissing = false) // <-- match 'false' is default but wanted to show it explicitly
 @RequiredArgsConstructor
-public class AmqPubsubProducerConfig {
+public class ScheduledProducerConfig {
 
     private final EventProducerFactory eventProducerFactory;
 
@@ -26,14 +28,15 @@ public class AmqPubsubProducerConfig {
     private String amqBrokerUsername;
     @Value("${eventing.amq.broker.password}")
     private String amqBrokerPassword;
-    @Value("${eventing.amq.pubsub.source.name}")
+    @Value("${eventing.amq.peer.source.name}") // Just an assumption - scheduler send events in a peer manner
     private String producerSourceName;
 
-    @Bean(name = "restAmqPubsubEventsProducer")
-    public EventProducer amqPubSubProducer() {
-        EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
-                .producerName("restPubSubProducer")
-                .applicationName("FakeRestApplication")
+    @Bean("scheduledPeerProducer")
+    public EventProducer scheduledProducerConfig() {
+
+        EventProducerSettings schedulerProducerSettings = EventProducerSettings.builder()
+                .producerName("ScheduledProducer")
+                .applicationName("FakeSchedulerApp")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
@@ -43,10 +46,10 @@ public class AmqPubsubProducerConfig {
                         .build())
                 .eventDestinationSettings(EventDestinationSettings.builder()
                         .sourceName(producerSourceName)
-                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
+                        .eventCommunicationModelType(EventCommunicationModelType.AMQ_PEER_TO_PEER)
                         .build())
                 .build();
 
-        return eventProducerFactory.createEventProducer(eventProducerSettings);
+        return eventProducerFactory.createEventProducer(schedulerProducerSettings);
     }
 }

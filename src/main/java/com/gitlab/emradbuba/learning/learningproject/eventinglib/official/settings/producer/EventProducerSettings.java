@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class EventProducerSettings {
     private final String producerName;
-    private final String microServiceName;
+    private final String applicationName;
     private final EventBrokerSettings eventBrokerSettings;
     private final EventDestinationSettings eventDestinationSettings;
 }

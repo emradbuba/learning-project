@@ -35,7 +35,7 @@ public class AmqPeerProducerConfig {
     public EventProducer amqPeerEventsProducer() {
         EventProducerSettings eventProducerSettings = EventProducerSettings.builder()
                 .producerName("restPeerProducer")
-                .microServiceName("FakeRestApplication")
+                .applicationName("FakeRestApplication")
                 .eventBrokerSettings(EventBrokerSettings.builder()
                         .brokerName(amqBrokerName)
                         .brokerUrl(amqBrokerUrl)
