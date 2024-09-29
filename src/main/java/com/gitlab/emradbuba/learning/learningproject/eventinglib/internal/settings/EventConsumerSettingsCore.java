@@ -1,6 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.validation.EventConsumerSettingsValidator;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.processing.IncomingMessageProcessor;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer.EventConsumerSettings;
@@ -20,6 +21,7 @@ public class EventConsumerSettingsCore {
     private final String brokerPassword;
     private final EventBrokerType eventBrokerType;
     private final EventCommunicationModelType eventCommunicationModelType;
+    private final IncomingMessageProcessor incomingMessageProcessor;
 
     public EventConsumerSettingsCore(final EventConsumerSettings eventConsumerSettings) {
         EventConsumerSettingsValidator.validateIncomingSettings(eventConsumerSettings);
@@ -33,5 +35,6 @@ public class EventConsumerSettingsCore {
         this.microServiceName = trim(eventConsumerSettings.getMicroServiceName());
         this.eventDestinationName = trim(eventConsumerSettings.getEventDestinationSettings().getSourceName());
         this.eventCommunicationModelType = eventConsumerSettings.getEventDestinationSettings().getEventCommunicationModelType();
+        this.incomingMessageProcessor = eventConsumerSettings.getIncomingMessageProcessor();
     }
 }

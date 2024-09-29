@@ -1,15 +1,15 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.consumer;
 
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.LoggingEventUtils;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message.ActiveMQMessageConverter;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.lifecycle.EventingLifecycleEntity;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.settings.EventConsumerSettingsCore;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
-import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
-import jakarta.jms.*;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.processing.IncomingMessageProcessor;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 
 @Slf4j
 public abstract class AbstractActiveMQEventConsumer implements EventConsumer, EventingLifecycleEntity {
@@ -17,6 +17,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     protected final EventConsumerSettingsCore eventConsumerSettingsCore;
     protected final String consumerName;
     protected final String applicationName;
+    protected final IncomingMessageProcessor incomingMessageProcessor;
 
     protected Connection connection = null;
     protected Session session = null;
@@ -26,6 +27,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
         this.eventConsumerSettingsCore = eventConsumerSettingsCore;
         this.consumerName = eventConsumerSettingsCore.getConsumerName();
         this.applicationName = eventConsumerSettingsCore.getMicroServiceName();
+        this.incomingMessageProcessor = eventConsumerSettingsCore.getIncomingMessageProcessor();
     }
 
     private void startListening() throws JMSException {
@@ -76,10 +78,7 @@ public abstract class AbstractActiveMQEventConsumer implements EventConsumer, Ev
     private void addMessageListener() throws JMSException {
         log.info("EventConsumer '{}': Adding message and error listeners...", consumerName);
         consumer.setMessageListener(message -> {
-            if (message instanceof ActiveMQTextMessage activeMQTextMessage) {
-                LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
-                LoggingEventUtils.logIncomingEvent(this, incomingLearningAppMessage);
-            }
+            incomingMessageProcessor.processMessage(message, this);
         });
     }
 

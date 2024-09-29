@@ -1,5 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.consumer;
 
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.processing.IncomingMessageProcessor;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventDestinationSettings;
 import lombok.Builder;
@@ -12,4 +13,5 @@ public class EventConsumerSettings {
     private final String consumerName;
     private final EventBrokerSettings eventBrokerSettings;
     private final EventDestinationSettings eventDestinationSettings;
+    private final IncomingMessageProcessor incomingMessageProcessor;
 }

@@ -1,4 +1,4 @@
-package com.gitlab.emradbuba.learning.learningproject.service;
+package com.gitlab.emradbuba.learning.learningproject.service.eventing;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventProducer;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;

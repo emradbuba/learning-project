@@ -2,6 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.config.eventing.pubsub;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.EventConsumerFactory;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventConsumer;
+import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.processing.IncomingMessageProcessor;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerSettings;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventBrokerType;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.settings.EventCommunicationModelType;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class AmqPubsubConsumerConfig {
 
     private final EventConsumerFactory eventConsumerFactory;
+    private final IncomingMessageProcessor incomingMessageProcessor;
 
     @Value("${eventing.amq.broker.name}")
     private String amqBrokerName;
@@ -45,6 +47,7 @@ public class AmqPubsubConsumerConfig {
                         .sourceName(consumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
+                .incomingMessageProcessor(incomingMessageProcessor)
                 .build();
 
         return eventConsumerFactory.createEventConsumer(eventConsumerSettings);
@@ -66,6 +69,7 @@ public class AmqPubsubConsumerConfig {
                         .sourceName(consumerSourceName)
                         .eventCommunicationModelType(EventCommunicationModelType.AMQ_PUBLISH_SUBSCRIBE)
                         .build())
+                .incomingMessageProcessor(incomingMessageProcessor)
                 .build();
 
         return eventConsumerFactory.createEventConsumer(eventConsumerSettings);

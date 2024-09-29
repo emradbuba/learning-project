@@ -15,6 +15,7 @@ public class EventConsumerSettingsValidator {
         validateSettingsNotNull(eventConsumerSettings);
         validateClientId(eventConsumerSettings);
         validateBrokerName(eventConsumerSettings);
+        validateIncomingMessageProcessor(eventConsumerSettings);
         validateBrokerSettings(eventConsumerSettings);
         validateSourceSettings(eventConsumerSettings);
     }
@@ -33,6 +34,12 @@ public class EventConsumerSettingsValidator {
     private static void validateBrokerName(final EventConsumerSettings eventConsumerSettings) {
         String consumerName = eventConsumerSettings.getConsumerName();
         validateIfStringDefined(consumerName, "consumerName", consumerName);
+    }
+
+    private static void validateIncomingMessageProcessor(final EventConsumerSettings eventConsumerSettings) {
+        if(eventConsumerSettings.getIncomingMessageProcessor() == null) {
+            throw new IllegalArgumentException("Missing incoming message processor - cannot create consumer...");
+        }
     }
 
     private static void validateBrokerSettings(final EventConsumerSettings eventConsumerSettings) {

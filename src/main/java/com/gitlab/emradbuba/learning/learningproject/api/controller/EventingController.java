@@ -2,7 +2,7 @@ package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.converter.RestApiEventRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.eventing.PostEventMessageRequest;
-import com.gitlab.emradbuba.learning.learningproject.service.EventingService;
+import com.gitlab.emradbuba.learning.learningproject.service.eventing.EventingService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.RestApiEventMessageCommand;
 import com.gitlab.emradbuba.learning.learningproject.validation.RestApiEventCommandValidator;
 import io.swagger.v3.oas.annotations.Operation;
