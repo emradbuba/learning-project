@@ -16,7 +16,15 @@ public class DefaultIncomingMessageProcessor implements IncomingMessageProcessor
     public void processMessage(Message incomingMessage, EventConsumer consumer) {
         if (incomingMessage instanceof ActiveMQTextMessage activeMQTextMessage) {
             LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
+            throwIfError(incomingLearningAppMessage);
             LoggingEventUtils.logIncomingEvent(consumer, incomingLearningAppMessage);
+        }
+    }
+
+    public void throwIfError(LearningAppMessage learningAppMessage) {
+        // Fake "poison" message for testing - such messages should be redelivered according to broker's settings
+        if (learningAppMessage.getMessageContent().equalsIgnoreCase("Poison message")) {
+            throw new RuntimeException("Cannot process this message - it causes exception");
         }
     }
 }

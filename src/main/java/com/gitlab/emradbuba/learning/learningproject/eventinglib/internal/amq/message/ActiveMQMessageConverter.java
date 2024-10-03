@@ -3,11 +3,13 @@ package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.m
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.other.LPUnexpectedException;
 import jakarta.jms.JMSException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQSession;
 import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 public class ActiveMQMessageConverter {
 
     public static ActiveMQTextMessage toActiveMQMessage(LearningAppMessage learningAppMessage, ActiveMQSession activeMQSession) {
@@ -26,6 +28,7 @@ public class ActiveMQMessageConverter {
             return activeMQTextMessage;
 
         } catch (JMSException e) {
+            log.warn("Could not convert message {} to ActiveMQMessage - '{}'", learningAppMessage.getMessageId(), e.getMessage());
             throw new LPUnexpectedException("Could not convert message to ActiveMQMessage - won't be sent ==> " + learningAppMessage.getMessageId());
         }
     }

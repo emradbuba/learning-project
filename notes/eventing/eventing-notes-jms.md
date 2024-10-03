@@ -163,6 +163,34 @@ JMS is just a standard. There are also different inplementations of this standar
 
 </details>
 
+#### Receiving a message
+<details>
+<summary>JMS support synchro receiving (what method?) but...?</summary>
+
+> The `receive()` method waits for incoming messages but can block the thread/app, so timeout should be set
+</details>
+
+<details>
+<summary><code>MessageListener</code> vs <code>SessionAwareMessageListener</code></summary>
+
+> * Second gets also session from the message comes from...
+> * Second throws `JMSException` outside
+</details>
+
+<details>
+<summary>How do we call a message which cannot be process? </summary>
+
+> Poison message
+</details>
+
+<details>
+<summary>What gives us a redelivery setup? </summary>
+
+> How many times a message should be redelivered before it's considered a poison message
+</details>
+
+
+
 #### Other
 <details>
 <summary>Main responsibilities of a broker</summary>
