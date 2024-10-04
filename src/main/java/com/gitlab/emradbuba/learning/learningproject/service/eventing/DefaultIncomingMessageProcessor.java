@@ -6,6 +6,7 @@ import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.EventC
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.processing.IncomingMessageProcessor;
 import jakarta.jms.Message;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +15,21 @@ public class DefaultIncomingMessageProcessor implements IncomingMessageProcessor
 
     @Override
     public void processMessage(Message incomingMessage, EventConsumer consumer) {
-        if (incomingMessage instanceof ActiveMQTextMessage activeMQTextMessage) {
-            LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
-            throwIfError(incomingLearningAppMessage);
-            LoggingEventUtils.logIncomingEvent(consumer, incomingLearningAppMessage);
+
+        switch (incomingMessage) {
+            case ActiveMQTextMessage activeMQTextMessage -> {
+                LearningAppMessage incomingLearningAppMessage = ActiveMQMessageConverter.fromActiveMQTextMessage(activeMQTextMessage);
+                throwIfError(incomingLearningAppMessage);
+                LoggingEventUtils.logIncomingEvent(consumer, incomingLearningAppMessage);
+            }
+            case ActiveMQMessage activeMQMessage -> {}
+            default -> {}
         }
     }
 
     public void throwIfError(LearningAppMessage learningAppMessage) {
         // Fake "poison" message for testing - such messages should be redelivered according to broker's settings
-        if (learningAppMessage.getMessageContent().equalsIgnoreCase("Poison message")) {
+        if ("Poison message".equalsIgnoreCase(learningAppMessage.getMessageContent())) {
             throw new RuntimeException("Cannot process this message - it causes exception");
         }
     }

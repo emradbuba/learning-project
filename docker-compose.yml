@@ -5,19 +5,13 @@ volumes:
   test-vol:
 
 services:
-  rest:
+  amq-broker:
     build: .
-    image: emradbuba/learning-project-restapp:tag-1.0.0-SNAPSHOT
-    container_name: learning-project-restapp-container
-    command: java -jar restapp-1.0.0-SNAPSHOT.jar
+    container_name: activemq-artemis
     ports:
-      - target: 8080 # <-- port of the restapp
-        published: 8080 # <-- published port for accessing from outside
-    networks:
-      - test-net
+      - "8161:8161"
+      - "61616:61616"
     volumes:
       - type: volume
         source: test-vol
-        target: /app
-
-# TODO: define a service for ActiveMQ broker
+        target: /activemq-artemis
