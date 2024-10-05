@@ -1,5 +1,14 @@
 # How to use the application
 
+RUN VIA DOCKER: 
+In order to start the application just go to `/infrastructure` directory and run docker compose: 
+```
+> docker-compose up -d
+```
+Then, you should be able to access the SwaggerUI: <br>
+http://localhost:8080/swagger-ui/index.html (credentials: `god`/`password`)
+
+
 ## Security 
 > <span style='color:#fa0'>***TODO***</span>
 > 
