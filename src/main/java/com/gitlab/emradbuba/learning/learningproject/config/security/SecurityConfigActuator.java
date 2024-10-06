@@ -25,6 +25,9 @@ public class SecurityConfigActuator {
     @Bean
     @Order(200)
     public SecurityFilterChain actuatorSecurityConfiguration(HttpSecurity httpSecurity) throws Exception {
+
+        // TODO: How to secure / expose health info to the user? Shouldn't it be public (no auth)? Same with liveness.
+
         return httpSecurity
                 .securityMatcher(antMatcher("/actuator/**"))
                 .csrf(AbstractHttpConfigurer::disable)
