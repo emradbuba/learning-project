@@ -1,8 +1,8 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPEmploymentCertNotFoundException;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LearningProjectNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.CertRepo;
@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceErrorUtils.createLPPersonNotFoundException;
-
-// TODO: (Done?) Podstawowy ControllerAdvice - jeśli jakis LP exception, to zbuduj jakis error response...
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LearningProjectServiceErrorUtils.createPersonNotFoundException;
 
 @Service
 @AllArgsConstructor
@@ -111,7 +109,7 @@ public class EmploymentCertificateService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId));
+                .orElseThrow(() -> createPersonNotFoundException(personBusinessId));
     }
 
     private EmploymentCertificateEntity getPersonCertificate(PersonEntity existingPersonEntity, String certId) {
@@ -120,12 +118,12 @@ public class EmploymentCertificateService {
                 .filter(cert -> cert.getBusinessId().equals(certId))
                 .findFirst()
                 .orElseThrow(() ->
-                        new LPEmploymentCertNotFoundException(
+                        new LearningProjectNotFoundException(
                                 String.format("Person with businessId=%s has no certificate with businessId=%s", existingPersonEntity.getBusinessId(), certId))
                                 .withPersonBusinessId(existingPersonEntity.getBusinessId())
                                 .withHttpStatusCodeValue(409)
-                                .withUniqueErrorCode(LPServiceExceptionErrorCode.CERT_ID_NOT_FOUND.getReasonCode())
-                                .withDescription(LPServiceExceptionErrorCode.CERT_ID_NOT_FOUND.getDescription())
+                                .withUniqueErrorCode(ExceptionErrorCode.CERT_ID_NOT_FOUND.getReasonCode())
+                                .withDescription(ExceptionErrorCode.CERT_ID_NOT_FOUND.getDescription())
                                 .withSolutionTip("Are you sure you meant the right person?")
                 );
     }

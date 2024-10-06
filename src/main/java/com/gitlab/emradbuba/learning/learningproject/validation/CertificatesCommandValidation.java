@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.validation;
 
-import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LearningProjectIncorrectInputException;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.AddNewCertificateCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.UpdateExistingCertificateCommand;
 import org.apache.commons.lang3.StringUtils;
@@ -18,10 +18,10 @@ public class CertificatesCommandValidation {
 
     private static void validateCompanyName(String companyName) {
         if (StringUtils.isBlank(companyName)) {
-            throw new LPIncorrectInputException("Company name must be specified")
+            throw new LearningProjectIncorrectInputException("Company name must be specified")
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_CERT_COMPANY_EMPTY.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_CERT_COMPANY_EMPTY.getDescription());
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_CERT_COMPANY_EMPTY.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_CERT_COMPANY_EMPTY.getDescription());
         }
     }
 
@@ -34,36 +34,36 @@ public class CertificatesCommandValidation {
 
     private static void validateDates(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
-            throw new LPIncorrectInputException("Start and end date must be specified")
+            throw new LearningProjectIncorrectInputException("Start and end date must be specified")
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_CERT_DATES_NULL.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_CERT_DATES_NULL.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_CERT_DATES_NULL.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_CERT_DATES_NULL.getDescription())
                     .withSolutionTip("Fix dates");
         }
         if (!endDate.isAfter(startDate)) {
-            throw new LPIncorrectInputException("Start and end date must be specified")
+            throw new LearningProjectIncorrectInputException("Start and end date must be specified")
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_CERT_DATES_RELATION.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_CERT_DATES_RELATION.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_CERT_DATES_RELATION.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_CERT_DATES_RELATION.getDescription())
                     .withSolutionTip("Maybe you put dates in wrong order?");
         }
     }
 
     private static void validatePersonId(String personBusinessId) {
         if (StringUtils.isBlank(personBusinessId)) {
-            throw new LPIncorrectInputException("Person business id must be specified")
+            throw new LearningProjectIncorrectInputException("Person business id must be specified")
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_CERT_CERT_ID_EMPTY.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_CERT_CERT_ID_EMPTY.getDescription());
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_CERT_CERT_ID_EMPTY.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_CERT_CERT_ID_EMPTY.getDescription());
         }
     }
 
     private static void validateCertificateId(String certificateBusinessId) {
         if (StringUtils.isBlank(certificateBusinessId)) {
-            throw new LPIncorrectInputException("Certificate business id must be specified")
+            throw new LearningProjectIncorrectInputException("Certificate business id must be specified")
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_CERT_PERSON_ID_EMPTY.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_CERT_PERSON_ID_EMPTY.getDescription());
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_CERT_PERSON_ID_EMPTY.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_CERT_PERSON_ID_EMPTY.getDescription());
         }
     }
 

@@ -1,7 +1,7 @@
 package com.gitlab.emradbuba.learning.learningproject.eventinglib.internal.amq.message;
 
 import com.gitlab.emradbuba.learning.learningproject.eventinglib.official.model.LearningAppMessage;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.other.LPUnexpectedException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.other.LearningProjectUnexpectedException;
 import jakarta.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.jms.client.ActiveMQSession;
@@ -29,7 +29,7 @@ public class ActiveMQMessageConverter {
 
         } catch (JMSException e) {
             log.warn("Could not convert message {} to ActiveMQMessage - '{}'", learningAppMessage.getMessageId(), e.getMessage());
-            throw new LPUnexpectedException("Could not convert message to ActiveMQMessage - won't be sent ==> " + learningAppMessage.getMessageId());
+            throw new LearningProjectUnexpectedException("Could not convert message to ActiveMQMessage - won't be sent ==> " + learningAppMessage.getMessageId());
         }
     }
 
@@ -46,7 +46,7 @@ public class ActiveMQMessageConverter {
                     .build();
 
         } catch (JMSException e) {
-            throw new LPUnexpectedException("Could not convert activeMQTextMessage to learningMsg - won't be consumer (?)"); // TODO: log sth reasonable to identify activeMQTextMessage
+            throw new LearningProjectUnexpectedException("Could not convert activeMQTextMessage to learningMsg - won't be consumer (?)"); // TODO: log sth reasonable to identify activeMQTextMessage
         }
     }
 }

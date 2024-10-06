@@ -1,9 +1,9 @@
 package com.gitlab.emradbuba.learning.learningproject.service;
 
 import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.business.LPBusinessRulesViolationException;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LPIdCardNotFoundException;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.business.LearningProjectBusinessRulesViolationException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.notfound.LearningProjectNotFoundException;
 import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.IdCardRepository;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceErrorUtils.createLPPersonNotFoundException;
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LearningProjectServiceErrorUtils.createPersonNotFoundException;
 
 @Service
 @AllArgsConstructor
@@ -44,13 +44,13 @@ public class IdCardService {
         PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessIdFromCmd);
         IdCardEntity existingIdCardEntity = existingPersonEntity.getIdCard();
         if (existingIdCardEntity != null) {
-            throw new LPBusinessRulesViolationException(
+            throw new LearningProjectBusinessRulesViolationException(
                     String.format(
                             "Person [%s] already has an idCard %s - cannot add a new one",
                             existingPersonEntity.getBusinessId(),
                             existingIdCardEntity.getBusinessId()))
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.ID_CARD_ALREADY_DEFINED.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.ID_CARD_ALREADY_DEFINED.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.ID_CARD_ALREADY_DEFINED.getReasonCode())
+                    .withDescription(ExceptionErrorCode.ID_CARD_ALREADY_DEFINED.getDescription())
                     .withPersonBusinessId(existingPersonEntity.getBusinessId())
                     .withHttpStatusCodeValue(409)
                     .withSolutionTip("Remove the old idCard before adding a new one");
@@ -74,10 +74,10 @@ public class IdCardService {
         String personBusinessIdFromCmd = updateExistingIdCardCommand.getPersonBusinessId();
         PersonEntity existingPersonEntity = getPersonByBusinessIdOrThrow(personBusinessIdFromCmd);
         IdCardEntity existingIdCardEntity = Optional.ofNullable(existingPersonEntity.getIdCard())
-                .orElseThrow(() -> new LPIdCardNotFoundException("IdCard does not exist for person with businessId: " + personBusinessIdFromCmd)
+                .orElseThrow(() -> new LearningProjectNotFoundException("IdCard does not exist for person with businessId: " + personBusinessIdFromCmd)
                         .withHttpStatusCodeValue(409)
-                        .withUniqueErrorCode(LPServiceExceptionErrorCode.ID_CARD_ID_NOT_FOUND.getReasonCode())
-                        .withDescription(LPServiceExceptionErrorCode.ID_CARD_ID_NOT_FOUND.getDescription())
+                        .withUniqueErrorCode(ExceptionErrorCode.ID_CARD_ID_NOT_FOUND.getReasonCode())
+                        .withDescription(ExceptionErrorCode.ID_CARD_ID_NOT_FOUND.getDescription())
                         .withSolutionTip("Make sure you put the right person id")
                         .withPersonBusinessId(personBusinessIdFromCmd));
         existingIdCardEntity.setSerialNumber(updateExistingIdCardCommand.getSerialNumber());
@@ -107,6 +107,6 @@ public class IdCardService {
     private PersonEntity getPersonByBusinessIdOrThrow(String personBusinessId) {
         return personRepository
                 .findByBusinessId(personBusinessId)
-                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId));
+                .orElseThrow(() -> createPersonNotFoundException(personBusinessId));
     }
 }

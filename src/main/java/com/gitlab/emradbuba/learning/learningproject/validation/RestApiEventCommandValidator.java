@@ -1,14 +1,14 @@
 package com.gitlab.emradbuba.learning.learningproject.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.eventing.MessageType;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LearningProjectIncorrectInputException;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.eventing.RestApiEventMessageCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
-import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode.*;
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode.*;
 
 public class RestApiEventCommandValidator {
 
@@ -20,7 +20,7 @@ public class RestApiEventCommandValidator {
         validateNotNull(restApiEventMessageCommand.getMessageType(), INCORRECT_REST_MESSAGE_TYPE);
     }
 
-    private static void validateExistingUUID(String messageId, LPServiceExceptionErrorCode errorCode) {
+    private static void validateExistingUUID(String messageId, ExceptionErrorCode errorCode) {
 
         if (StringUtils.isBlank(messageId)) {
             return;
@@ -29,7 +29,7 @@ public class RestApiEventCommandValidator {
         try {
             UUID.fromString(messageId);
         } catch (IllegalArgumentException e) {
-            throw new LPIncorrectInputException("Error while validating RestApiEventMessageCommand")
+            throw new LearningProjectIncorrectInputException("Error while validating RestApiEventMessageCommand")
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(errorCode.getReasonCode())
                     .withDescription(errorCode.getDescription())
@@ -37,9 +37,9 @@ public class RestApiEventCommandValidator {
         }
     }
 
-    private static void validateMessageText(String messageText, LPServiceExceptionErrorCode errorCode) {
+    private static void validateMessageText(String messageText, ExceptionErrorCode errorCode) {
         if (StringUtils.isBlank(messageText)) {
-            throw new LPIncorrectInputException("Error while validating RestApiEventMessageCommand")
+            throw new LearningProjectIncorrectInputException("Error while validating RestApiEventMessageCommand")
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(errorCode.getReasonCode())
                     .withDescription(errorCode.getDescription())
@@ -47,9 +47,9 @@ public class RestApiEventCommandValidator {
         }
     }
 
-    private static void validateNotNull(MessageType messageType, LPServiceExceptionErrorCode errorCode) {
+    private static void validateNotNull(MessageType messageType, ExceptionErrorCode errorCode) {
         if (messageType == null) {
-            throw new LPIncorrectInputException("Error while validating RestApiEventMessageCommand")
+            throw new LearningProjectIncorrectInputException("Error while validating RestApiEventMessageCommand")
                     .withHttpStatusCodeValue(422)
                     .withUniqueErrorCode(errorCode.getReasonCode());
         }

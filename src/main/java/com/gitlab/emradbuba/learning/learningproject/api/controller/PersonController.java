@@ -7,7 +7,7 @@ import com.gitlab.emradbuba.learning.learningproject.api.controller.response.LPR
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PostNewPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.person.PutExistingPersonRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LearningProjectException;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.PersonService;
 import com.gitlab.emradbuba.learning.learningproject.service.commands.person.AddNewPersonCommand;
@@ -56,7 +56,7 @@ public class PersonController {
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new LPException("Error while getting a person by id", e)
+            throw new LearningProjectException("Error while getting a person by id", e)
                     .withPersonBusinessId(personBusinessId);
         }
     }
@@ -78,7 +78,7 @@ public class PersonController {
                     .build();
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new LPException("Error while creating a new person", e);
+            throw new LearningProjectException("Error while creating a new person", e);
         }
     }
 
@@ -103,7 +103,7 @@ public class PersonController {
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new LPException("Error while updating an existing person", e)
+            throw new LearningProjectException("Error while updating an existing person", e)
                     .withPersonBusinessId(personBusinessId);
         }
     }
@@ -123,7 +123,7 @@ public class PersonController {
             ValidationUtils.validateUUID(personBusinessId);
             personService.deletePerson(personBusinessId);
         } catch (Exception e) {
-            throw new LPException("Error while deleting an existing person", e)
+            throw new LearningProjectException("Error while deleting an existing person", e)
                     .withPersonBusinessId(personBusinessId);
         }
     }

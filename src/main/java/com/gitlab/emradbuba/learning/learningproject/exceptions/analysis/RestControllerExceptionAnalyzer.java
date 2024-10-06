@@ -1,6 +1,6 @@
 package com.gitlab.emradbuba.learning.learningproject.exceptions.analysis;
 
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LPException;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.LearningProjectException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
@@ -15,7 +15,7 @@ public class RestControllerExceptionAnalyzer {
 
     private final LinkedList<Throwable> throwableChainStartingFromRoot;
     private final Throwable mainThrowable;
-    private LPException firstLearningProjectException;
+    private LearningProjectException firstLearningProjectException;
 
     public RestControllerExceptionAnalyzer(Throwable mainThrowable) {
         this.mainThrowable = mainThrowable;
@@ -49,15 +49,15 @@ public class RestControllerExceptionAnalyzer {
 
     private void initFirstLearningProjectException() {
         this.firstLearningProjectException = this.throwableChainStartingFromRoot.stream()
-                .filter(LPException.class::isInstance)
-                .map(LPException.class::cast)
+                .filter(LearningProjectException.class::isInstance)
+                .map(LearningProjectException.class::cast)
                 .findFirst()
                 .orElse(null);
     }
 
     private HttpStatus determineFinalHttpStatus() {
         return Optional.ofNullable(firstLearningProjectException)
-                .map(LPException::getHttpStatusCodeValue)
+                .map(LearningProjectException::getHttpStatusCodeValue)
                 .map(HttpStatus::resolve)
                 .orElse(DEFAULT_ERROR_HTTP_STATUS);
     }
@@ -75,32 +75,32 @@ public class RestControllerExceptionAnalyzer {
 
     private String determineLPExceptionErrorCode() {
         return Optional.ofNullable(firstLearningProjectException)
-                .map(LPException::getUniqueErrorCode)
+                .map(LearningProjectException::getUniqueErrorCode)
                 .filter(StringUtils::isNoneBlank)
                 .orElse(null);
     }
 
     private String determineLPExceptionDescription() {
         return Optional.ofNullable(firstLearningProjectException)
-                .map(LPException::getDescription)
+                .map(LearningProjectException::getDescription)
                 .filter(StringUtils::isNoneBlank)
                 .orElse(null);
     }
 
     private List<String> determineSolutionTips() {
         return throwableChainStartingFromRoot.stream()
-                .filter(LPException.class::isInstance)
-                .map(LPException.class::cast)
-                .map(LPException::getSolutionTip)
+                .filter(LearningProjectException.class::isInstance)
+                .map(LearningProjectException.class::cast)
+                .map(LearningProjectException::getSolutionTip)
                 .filter(StringUtils::isNoneBlank)
                 .toList();
     }
 
     private String determinePersonBusinessId() {
         return throwableChainStartingFromRoot.stream()
-                .filter(LPException.class::isInstance)
-                .map(LPException.class::cast)
-                .map(LPException::getPersonBusinessId)
+                .filter(LearningProjectException.class::isInstance)
+                .map(LearningProjectException.class::cast)
+                .map(LearningProjectException::getPersonBusinessId)
                 .filter(StringUtils::isNoneBlank)
                 .findFirst()
                 .orElse(null);
