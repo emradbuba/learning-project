@@ -1,4 +1,4 @@
-## Docker - basic notes
+## Docker
 
 ### Intial commands overview
 
@@ -189,6 +189,16 @@
 >  ```
 </details>
 
+<details>
+<summary>How docker-compose knows when to rebuild image? </summary>
+
+> * `docker-compose up --build` will always rebuild image
+> * Changes in Dockerfile
+> * Changes in files use in build (like `COPY`ied or `ADD`ed files)
+> * Changes in docker-file
+> * 
+</details>
+
 ### Exposing / publishing ports: 
 <details>
 <summary>Is there a difference between <code>EXPOSE</code> and <code>-p 8080:8090</code> ?</summary>
@@ -201,7 +211,8 @@
 > * **Publishing** - #outside #world - it produces a firewall rule that binds a container port to a port on the Docker host, ensuring the ports are accessible to any client that can communicate with the host.
 </details>
 
-Docker cache
+### Docker cache
+```
 $ docker system prune -a
 WARNING! This will remove:
 - all stopped containers
@@ -209,3 +220,13 @@ WARNING! This will remove:
 - all images without at least one container associated to them
 - all build cache
 y
+```
+
+<details>
+<summary>When docker uses cache?</summary>
+
+> * Changes in DockerFile Layers, like `ADD`, `COPY`, `RUN`...
+> * Invalidates cache - consequtive layers
+> * 
+</details>
+
