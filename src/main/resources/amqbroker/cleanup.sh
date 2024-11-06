@@ -1,0 +1,2 @@
+./rmqu.sh
+./rmad.sh

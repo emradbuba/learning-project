@@ -1,0 +1,47 @@
+networks:
+  learning-app-network:
+
+volumes:
+  learning-app-volume:
+
+services:
+  amq-broker-service:
+    build:
+      context: ./.. # <-- context, all required files should be here (in particular /target to copy from)
+      dockerfile: ./infrastructure/artemis/Dockerfile
+    container_name: activemq-artemis-broker-container
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    volumes:
+      - type: volume
+        # source: name of the volume on docker host we refer to:
+        source: learning-app-volume
+        # target: mount point inside container (so learning-app-volume will be accessible in container under /activemq-artemis-vol)
+        # all data stored in container under /activemq-artemis-vol will be actually stored under learning-app-vol (cross-container-vol)
+        target: /activemq-artemis-volume
+  learning-project-app:
+    build:
+      context: ./.. # <-- context, all required files should be here (in particular /target to copy from)
+      dockerfile: ./infrastructure/main-app/Dockerfile
+    container_name: learning-project-app-container
+    environment:
+      LEARNING_APP_NAME: "Learning Application - Docker"
+      SERVER_PORT: 8080
+      EVENTING_AMQ_BROKER_NAME: "Artemis Broker"
+      EVENTING_AMQ_BROKER_URL: "tcp://activemq-artemis-broker-container:61616"
+      EVENTING_AMQ_BROKER_USERNAME: "artemis"
+      EVENTING_AMQ_BROKER_PASSWORD: "artemis"
+      EVENTING_AMQ_PEER_SOURCE_NAME: "PeerEventQueue"
+      EVENTING_AMQ_PUBSUB_SOURCE_NAME: "PubSubEventTopic"
+    depends_on:
+      - amq-broker-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: volume
+        # source: name of the volume on docker host we refer to:
+        source: learning-app-volume
+        # target: mount point inside container (so learning-app-volume will be accessible in container under /activemq-artemis-vol)
+        # all data stored in container under /activemq-artemis-vol will be actually stored under learning-app-vol (cross-container-vol)
+        target: /learning-project-app-volume

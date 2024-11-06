@@ -22,7 +22,6 @@ public class SecurityConfigRestApi {
 
     public static final String ADMIN_ROLE_NAME = "ADMIN";
     public static final String USER_ROLE_NAME = "USER";
-    public static final String API_URL_PATTERN = "/api/**";
 
     private final UserDetailsService inMemoryUsersDetailsService;
 
@@ -34,11 +33,11 @@ public class SecurityConfigRestApi {
     @Order(500)
     public SecurityFilterChain restApiSecurityConfiguration(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .securityMatcher(API_URL_PATTERN)
+                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(antMatcher(HttpMethod.DELETE, API_URL_PATTERN)).hasAnyRole(ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
-                        .requestMatchers(antMatcher(API_URL_PATTERN)).hasAnyRole(USER_ROLE_NAME, ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
+                        .requestMatchers(antMatcher(HttpMethod.DELETE, "/api/**")).hasAnyRole(ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
+                        .requestMatchers(antMatcher("/api/**")).hasAnyRole(USER_ROLE_NAME, ADMIN_ROLE_NAME, GOD_MODE_ROLENAME)
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(inMemoryUsersDetailsService)

@@ -1,9 +1,9 @@
 package com.gitlab.emradbuba.learning.learningproject.validation;
 
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.idcard.PutIdCardRequest;
-import com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceExceptionErrorCode;
-import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LPIncorrectInputException;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewIdCardCommand;
+import com.gitlab.emradbuba.learning.learningproject.exceptions.ExceptionErrorCode;
+import com.gitlab.emradbuba.learning.learningproject.libs.exceptions.core.unprocessable.LearningProjectIncorrectInputException;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.idcard.AddNewIdCardCommand;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -31,37 +31,37 @@ public class IdCardCommandValidator {
 
     private static void validatePublishedBy(String publishedBy) {
         if (StringUtils.isBlank(publishedBy)) {
-            throw new LPIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
+            throw new LearningProjectIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_PUBLISHER_EMPTY.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_PUBLISHER_EMPTY.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_ID_CARD_PUBLISHER_EMPTY.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_ID_CARD_PUBLISHER_EMPTY.getDescription())
                     .withSolutionTip("Enter a serial number in the request");
         }
     }
 
     private static void validateSerialNumber(String idCardSerialNumber) {
         if (StringUtils.isBlank(idCardSerialNumber)) {
-            throw new LPIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
+            throw new LearningProjectIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_SERIAL_NUMBER_EMPTY.getReasonCode())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_SERIAL_NUMBER_EMPTY.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_ID_CARD_SERIAL_NUMBER_EMPTY.getReasonCode())
+                    .withDescription(ExceptionErrorCode.INCORRECT_ID_CARD_SERIAL_NUMBER_EMPTY.getDescription())
                     .withSolutionTip("Enter a serial number in the request");
         }
     }
 
     private static void validateValidityDate(LocalDate validUntil) {
         if (validUntil == null) {
-            throw new LPIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
+            throw new LearningProjectIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_EMPTY.name())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_EMPTY.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_ID_CARD_DATE_EMPTY.name())
+                    .withDescription(ExceptionErrorCode.INCORRECT_ID_CARD_DATE_EMPTY.getDescription())
                     .withSolutionTip("Enter the validity in the request");
         }
         if (validUntil.isBefore(LocalDate.now())) {
-            throw new LPIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
+            throw new LearningProjectIncorrectInputException(ERROR_WHEN_VALIDATING_INPUT_DATA)
                     .withHttpStatusCodeValue(422)
-                    .withUniqueErrorCode(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_INVALID.name())
-                    .withDescription(LPServiceExceptionErrorCode.INCORRECT_ID_CARD_DATE_INVALID.getDescription())
+                    .withUniqueErrorCode(ExceptionErrorCode.INCORRECT_ID_CARD_DATE_INVALID.name())
+                    .withDescription(ExceptionErrorCode.INCORRECT_ID_CARD_DATE_INVALID.getDescription())
                     .withSolutionTip("Enter the valid date - make sure you try to input the correct card!");
         }
     }

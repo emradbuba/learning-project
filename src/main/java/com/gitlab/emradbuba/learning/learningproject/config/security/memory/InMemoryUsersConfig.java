@@ -11,7 +11,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @Configuration
 public class InMemoryUsersConfig {
 
-    private static final String PASSWORD_BCRYPTED = "{bcrypt}$2a$04$miXxzUlDyDV4Wwmn1IKpt.pSLEYaTBptJHeyJRjxZJrPyX2Is5cXS";
+    private static final String PASSWORD_BCRYPTED = "{bcrypt}$2a$12$5WCWV7G7.0.JO9O8t7biT.AcGjzqm1IBPexjqtzuUOuEOOHyBpQCa"; // "password"
 
     @Bean("inMemoryUserDetailsService")
     public UserDetailsService inMemoryUserDetailsService() {

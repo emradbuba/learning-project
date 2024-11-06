@@ -1,16 +1,15 @@
 package com.gitlab.emradbuba.learning.learningproject.api.controller;
 
-import com.gitlab.emradbuba.learning.learningproject.api.converters.certificate.PostCertificateRequestToCommandConverter;
-import com.gitlab.emradbuba.learning.learningproject.api.converters.certificate.PutCertificateRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.converter.PostCertificateRequestToCommandConverter;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.converter.PutCertificateRequestToCommandConverter;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.certificate.PostCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.api.model.request.certificate.PutCertificateRequest;
 import com.gitlab.emradbuba.learning.learningproject.exceptions.LPErrorResponse;
 import com.gitlab.emradbuba.learning.learningproject.model.EmploymentCertificate;
-import com.gitlab.emradbuba.learning.learningproject.model.IdCard;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.service.EmploymentCertificateService;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewCertificateCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.AddNewCertificateCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.certificate.UpdateExistingCertificateCommand;
 import com.gitlab.emradbuba.learning.learningproject.validation.CertificatesCommandValidation;
 import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

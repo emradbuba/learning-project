@@ -4,8 +4,8 @@ import com.gitlab.emradbuba.learning.learningproject.BusinessIdUtils;
 import com.gitlab.emradbuba.learning.learningproject.model.Person;
 import com.gitlab.emradbuba.learning.learningproject.persistance.PersonRepository;
 import com.gitlab.emradbuba.learning.learningproject.persistance.model.PersonEntity;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.AddNewPersonCommand;
-import com.gitlab.emradbuba.learning.learningproject.service.commands.UpdateExistingPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.AddNewPersonCommand;
+import com.gitlab.emradbuba.learning.learningproject.service.commands.person.UpdateExistingPersonCommand;
 import com.gitlab.emradbuba.learning.learningproject.service.converters.PersonEntityToPersonConverter;
 import com.gitlab.emradbuba.learning.learningproject.validation.ValidationUtils;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 
-import static com.gitlab.emradbuba.learning.learningproject.exceptions.LPServiceErrorUtils.createLPPersonNotFoundException;
+import static com.gitlab.emradbuba.learning.learningproject.exceptions.LearningProjectServiceErrorUtils.createPersonNotFoundException;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +25,7 @@ public class PersonService {
     public Person getPerson(final String personBusinessId) {
         ValidationUtils.validateUUID(personBusinessId);
         PersonEntity personEntity = personRepository.findByBusinessId(personBusinessId)
-                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId)
+                .orElseThrow(() -> createPersonNotFoundException(personBusinessId)
                         .withSolutionTip("Maybe person was not yet create or removed?"));
         return personEntityToPersonConverter.fromPersonEntity(personEntity);
     }
@@ -49,7 +49,7 @@ public class PersonService {
     public Person updateExistingPerson(final UpdateExistingPersonCommand updateExistingPersonCommand) {
         String personBusinessId = updateExistingPersonCommand.getBusinessId();
         PersonEntity existingPersonEntity = personRepository.findByBusinessId(personBusinessId)
-                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId)
+                .orElseThrow(() -> createPersonNotFoundException(personBusinessId)
                         .withSolutionTip("Make sure the person you want to update wasn't removed before"));
         existingPersonEntity.setFirstName(updateExistingPersonCommand.getFirstName());
         existingPersonEntity.setSurname(updateExistingPersonCommand.getSurname());
@@ -62,7 +62,7 @@ public class PersonService {
     @Transactional
     public void deletePerson(final String personBusinessId) {
         PersonEntity existingPersonEntity = personRepository.findByBusinessId(personBusinessId)
-                .orElseThrow(() -> createLPPersonNotFoundException(personBusinessId)
+                .orElseThrow(() -> createPersonNotFoundException(personBusinessId)
                         .withSolutionTip("Maybe person was already removed by other system"));
         personRepository.deleteById(existingPersonEntity.getId());
     }

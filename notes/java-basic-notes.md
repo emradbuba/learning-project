@@ -172,9 +172,10 @@ Basically easy stuff (similar description [here](https://www.digitalocean.com/co
 </details>
 
 <details>
-<summary><b>Code examples</b> with String equality: </summary>
+<summary><b>CODE EXAMPLE</b> with String equality: </summary>
 
 > ```java
+> public class StringPoolExample {
 >     public static void main(String[] args) {
 >         String radekA = "Radek";
 >         String radekB = "Radek";
@@ -206,6 +207,7 @@ Basically easy stuff (similar description [here](https://www.digitalocean.com/co
 >         String monicaB = monicaA.toString();
 >         System.out.println(monicaA == monicaB); // <== result 6
 >     }
+> }
 > ```
 > <details>
 > <summary>Result 1</summary>
