@@ -26,6 +26,6 @@ public class CustomInfoContributor implements InfoContributor {
         information.put("version", version);
         information.put("description", customInfoFromProperties);
         information.put("personCount", "" + personService.countPerson());
-        builder.withDetail("personInfo", information);
+        builder.withDetail("additionalInfo", information);
     }
 }

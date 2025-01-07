@@ -10,12 +10,14 @@
 	</parent>
 	<groupId>com.gitlab.emradbuba.learning</groupId>
 	<artifactId>learningproject</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>learning-project</name>
 	<description>Demo project for learning SpringBoot</description>
 	<properties>
 		<java.version>21</java.version>
         <lombok.version>1.18.34</lombok.version>
+        <learningproject.lib.security.version>1.0.0-SNAPSHOT</learningproject.lib.security.version>
+        <learningproject.lib.lp.exceptions.version>1.0.0-SNAPSHOT</learningproject.lib.lp.exceptions.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -78,12 +80,12 @@
         <dependency>
             <groupId>com.gitlab.emradbuba.learning.learningproject.libs</groupId>
             <artifactId>learningproject-lib-security</artifactId>
-            <version>1.0.0</version>
+            <version>${learningproject.lib.security.version}</version>
         </dependency>
         <dependency>
             <groupId>com.gitlab.emradbuba.learning.learningproject.libs</groupId>
             <artifactId>learningproject-lib-lp-exceptions</artifactId>
-            <version>1.1.0</version>
+            <version>${learningproject.lib.lp.exceptions.version}</version>
         </dependency>
 
     </dependencies>

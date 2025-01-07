@@ -1,5 +1,11 @@
 ## Docker
 
+<details>
+<summary>What is a Dockerfile?</summary>
+
+> A Dockerfile is a script-like text file that contains a series of instructions on how to build a Docker image.
+</details>
+
 ### Intial commands overview
 
 #### -- Images --
@@ -12,6 +18,12 @@
 > docker image build -t emradbuba/learning-project-repo:tag-1.0.0 .
 > docker build --no-cache -t emradbuba/learning-project-repo:tag-1.0.0 .
 > ```
+</details>
+
+<details>
+<summary>What the <code>--no-cache</code> does in build command?</summary>
+
+> When building an image, Docker reuses unchanged layers to speed up to process of building an image. This flag prevents this cache.
 </details>
 
 <details>

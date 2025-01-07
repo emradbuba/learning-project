@@ -6,6 +6,7 @@ volumes:
 
 services:
   amq-broker-service:
+    image: activemq-artemis-broker-image:1.0.0
     build:
       context: ./.. # <-- context, all required files should be here (in particular /target to copy from)
       dockerfile: ./infrastructure/artemis/Dockerfile
@@ -17,10 +18,11 @@ services:
       - type: volume
         # source: name of the volume on docker host we refer to:
         source: learning-app-volume
-        # target: mount point inside container (so learning-app-volume will be accessible in container under /activemq-artemis-vol)
-        # all data stored in container under /activemq-artemis-vol will be actually stored under learning-app-vol (cross-container-vol)
+        # target: mount point inside container (so learning-app-volume will be accessible in container under /activemq-artemis-volume)
+        # all data stored in container under /activemq-artemis-volume will be actually stored under learning-app-volume (cross-container-volume)
         target: /activemq-artemis-volume
   learning-project-app:
+    image: learning-project-app-image:1.0.0
     build:
       context: ./.. # <-- context, all required files should be here (in particular /target to copy from)
       dockerfile: ./infrastructure/main-app/Dockerfile
