@@ -67,6 +67,52 @@ try {
 
 ## Entity lifecycle
 
+### Sample Entity: 
+<details>
+<summary>This is how a sample Entity is defined:</summary>
+
+```java
+@Entity
+@Table(name = "ACTIVITIES")
+@Getter
+@Setter
+public class ActivityEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Note: for Oracle uses sequence
+    private Long id;
+    private String code;
+    private String name;
+    private LocalDateTime startTime;
+    private LocalDateTime stopTime;
+    private String description;
+
+}
+```
+</details>
+<br>
+
+#### Access strategy
+<details>
+<summary>Does hibernate uses fields or getters/setters?</summary>
+
+> Depending on where we put the `@Id`. 
+> If on fields, then fields are user to set and get data, 
+> when on a method (getter), then getters and setters are used.
+</details>
+
+<details>
+<summary>If `@Id` on fields are all getters required? </summary>
+
+> No. This is one of the advantage using fields access. As Hibernate will not use getters/setters, we can limit the number of accessibale/modifiable data.
+</details>
+
+<details>
+<summary>What about flexibility of getter when using fields access?</summary>
+
+> As getters/setter are not used, we can implement their logic without fulfilling any external (JPA) requirements...
+</details>
+
 ### Lifecycle
 There are four states in lifecycle of entity (see: [ObjectDB article](https://www.objectdb.com/java/jpa/persistence/managed))
 <details>
@@ -277,6 +323,7 @@ Hikari - what it is? Is it used in Spring? Can be configured/customized?
 > Out of scope here, but we can create custom generators for OK ids.
 </details>
 
+<br>
 <details>
 <summary>Cascade.ALL not recomended?</summary>
 

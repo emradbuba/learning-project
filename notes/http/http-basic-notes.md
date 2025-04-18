@@ -75,6 +75,7 @@ Before any calls are possible.
 <summary>What is a persistent connection? </summary>
 
 > Just a connection with `Connection: Keep-Alive` which is default
+> Persistent connection are not open/closed by each request, but are kept alive (opened) between requests to increase performance.
 </details>
 
 <details>

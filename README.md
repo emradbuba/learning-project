@@ -14,6 +14,7 @@ When libraries are built, run `mvn clean install` for main app 'learning-project
 ### Docker 
 In order to start the application just go to `/infrastructure` directory and run docker compose: 
 ```
+> cd infrastructure/
 > docker-compose up -d
 ```
 Then, you should be able to access the SwaggerUI: <br>
